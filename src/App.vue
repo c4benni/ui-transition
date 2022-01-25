@@ -1,19 +1,34 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
-</template>
+<script setup lang="ts">
+import { ref } from 'vue'
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import UiTransition from './components/UiTransition/UiTransition.vue'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-});
+const show = ref(false);
+
 </script>
+
+<template>
+
+    <div
+      style='width:400px;height:400px'
+    >
+  <UiTransition>
+    <div
+            v-if="show"
+            style="height:100%;width:100%;background:red"
+    >
+      
+    </div>
+  </UiTransition>
+    </div>
+
+
+  <button
+    @click="show = !show"
+  >
+    toggle
+  </button>
+</template>
 
 <style>
 #app {
