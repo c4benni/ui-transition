@@ -30,7 +30,10 @@ export default function extractConfig(
   };
 
   if (typeof configProp == "string") {
-    const savedAnim = uiAnimations.value[configProp];
+    // string with args eg fade(0,1)
+    const argsRegExp = /\(.+\)$/g;
+
+    const savedAnim = uiAnimations.value[configProp.replace(argsRegExp, "")];
 
     if (!savedAnim) {
       return defaults;
@@ -39,9 +42,6 @@ export default function extractConfig(
     // call savedAnim if it exists, passing any args that configProp holds;
 
     const extractStringArgs = (): any[] => {
-      // string with args eg fade(0,1)
-      const argsRegExp = /\(.+\)$/g;
-
       if (!argsRegExp.test(configProp)) {
         return [];
       }
