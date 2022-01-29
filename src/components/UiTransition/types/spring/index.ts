@@ -4,4 +4,5 @@ export interface SpringConfig {
   precision?: number;
   tension?: number;
   stopAttempt?: number;
+  velocity?: number;
 }
