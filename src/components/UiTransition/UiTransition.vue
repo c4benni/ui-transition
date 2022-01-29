@@ -31,7 +31,7 @@ export default defineComponent({
 
   props,
 
-  setup(p, { slots }) {
+  setup(p, { slots, emit }) {
     const props = computed(()=> p);
 
     const animState = ref<AnimState>('enter');
@@ -63,11 +63,13 @@ export default defineComponent({
           appear: true,
 
           ...eventHooks({
-            configProp: getExtractedConfig.value,
+            configProp: getExtractedConfig,
             keyframes,
             getKeyframeName,
             styleId: globalState.styleId,
-            animState
+            animState,
+            appear: true,
+            emit
           }),
         },
         {
