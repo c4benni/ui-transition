@@ -2,11 +2,12 @@ import { ConfigDirection } from "../props/config";
 import { DynamicObject } from "../utils";
 
 export interface CreateSpring {
-  stiffness?: number;
-  damping?: number;
+  tension?: number;
+  friction?: number;
   mass?: number;
   precision?: number;
   stopAttempt?: number;
+  velocity?: number;
 }
 
 export type AsyncWorker = (arg: {
