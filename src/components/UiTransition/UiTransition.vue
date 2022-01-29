@@ -1,13 +1,10 @@
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  h,
-  onBeforeMount,
-} from "@vue/runtime-core";
+import { computed, defineComponent, h, onBeforeMount, ref } from "@vue/runtime-core";
 import { Transition } from "@vue/runtime-dom";
 
-import { DynamicObject, GlobalState } from "./types/utils";
+import { AnimState, DynamicObject, GlobalState } from "./types/utils";
+
+import extractConfig from './utils/extractConfig'
 
 import props from "./props";
 
@@ -15,43 +12,41 @@ import { createStyleNode, keyframeName } from "./utils/component";
 
 import eventHooks from "./utils/eventHooks";
 
-import workerBox from './utils/workerBox'
+import workerBox from "./utils/workerBox";
 
 import createWorker from "./utils/createWorker";
 
 const globalState: GlobalState = {
-  styleCreated:false,
-  styleId:'',
-  workerCreated:false
-}
+  styleCreated: false,
+  styleId: "",
+  workerCreated: false,
+};
 
 // store keyframes names as key and a truthy value as value;
 // so looking up and deleting will be faster and easy on mem.
 const keyframes: DynamicObject<number> = {};
-
-const tempConfig = {
-  from: {
-    transform: "scale3d({0.75},{0.75},1)",
-    opacity: "{0}",
-  },
-  to: {
-    transform: "scale3d({1},{1},1)",
-    opacity: "{1}",
-  },
-  delay: 0,
-  origin: "center",
-};
 
 export default defineComponent({
   name: "UiTransition",
 
   props,
 
-  setup(_, { slots }) {
-    const getKeyframeName = computed(() => keyframeName(tempConfig));
+  setup(p, { slots }) {
+    const props = computed(()=> p);
+
+    const animState = ref<AnimState>('enter');
+    const getExtractedConfig = 
+      computed(()=> extractConfig(props.value.config, animState.value));
+
+    const getKeyframeName = 
+      computed(() => keyframeName(getExtractedConfig.value));
 
     onBeforeMount(() => {
-      createStyleNode(globalState);
+      if (!globalState.styleCreated) {
+        createStyleNode(globalState);
+
+        globalState.styleCreated = true;
+      }
 
       if (!globalState.workerCreated) {
         workerBox.webWorker = createWorker();
@@ -68,10 +63,11 @@ export default defineComponent({
           appear: true,
 
           ...eventHooks({
-            tempConfig,
+            configProp: getExtractedConfig.value,
             keyframes,
             getKeyframeName,
             styleId: globalState.styleId,
+            animState
           }),
         },
         {
@@ -85,13 +81,13 @@ export default defineComponent({
 
 <style scoped>
 .ui-transition {
-  transform: var(--uit-transform);
-  opacity: var(--uit-opacity);
-  will-change: transform, opacity;
-  animation-timing-function: linear;
-  animation-delay: var(--uit-delay);
-  animation-name: var(--uit-anim-name);
-  animation-duration: var(--uit-anim-duration);
+  transform: var(--uit-transform) !important;
+  opacity: var(--uit-opacity) !important;
+  will-change: transform, opacity !important;
+  animation-timing-function: linear !important;
+  animation-delay: var(--uit-delay) !important;
+  animation-name: var(--uit-anim-name) !important;
+  animation-duration: var(--uit-anim-duration) !important;
   transition-duration: 0ms !important;
 }
 </style>
