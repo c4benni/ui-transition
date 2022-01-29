@@ -112,9 +112,17 @@ const worker = function () {
               return (self.saved[savePath] = positions);
             });
 
-          const springValues = springAnimation({});
+          const springValues = springAnimation(
+            e.data.parse
+              ? e.data?.data?.spring || {}
+              : typeof e.data === "object"
+              ? e.data
+              : {}
+          );
 
           if (e.data.parse) {
+            const mustacheRegExp = /(\{-?(?:\d+?\.?)?\d+(?:[a-zA-Z]+|%)?\})/g;
+
             const progress: Progress = (from, to, ratio) =>
               from + (to - from) * ratio;
 
@@ -144,12 +152,12 @@ const worker = function () {
                     str: string,
                     hasUnit: boolean
                   ): Mustache[] =>
-                    (str.match(/\{\.?\d+(?:\.\d+)?(?:[a-zA-Z]+|%)?}/g) || [])
+                    (str.match(mustacheRegExp) || [])
                       // remove any with > 1 dot
                       .filter((str) => !str.match(/\..\./g))
                       .map((str) => {
                         const returnValue: Mustache = {
-                          value: (str.match(/\.?\d+(?:\.\d+)?/g) || [])[0],
+                          value: (str.match(/-?\.?\d+(?:\.\d+)?/g) || [])[0],
                         };
 
                         if (hasUnit) {
@@ -190,14 +198,12 @@ const worker = function () {
                   const arrayClone = [...array];
 
                   //  split original to get mustaches; then loop and replace mustache with the first arrayClone item; shift that cloneArray item away;
-                  const splitted = original
-                    .split(/(\{(?:\d+?\.?)?\d+(?:[a-zA-Z]+)?\})/g)
-                    .map((str) => {
-                      if (/^\{/.test(str)) {
-                        return arrayClone.shift();
-                      }
-                      return str;
-                    });
+                  const splitted = original.split(mustacheRegExp).map((str) => {
+                    if (/^\{/.test(str)) {
+                      return arrayClone.shift();
+                    }
+                    return str;
+                  });
 
                   // join splitted values back and return
                   return splitted.join("");
