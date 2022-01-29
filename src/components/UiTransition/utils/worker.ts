@@ -22,13 +22,13 @@ const worker = function () {
   self.addEventListener(
     "message",
     async (e) => {
-      if (e.data?.name === "ui-transition") {
+      if (e.data?.name === "uit") {
         const post = (data: any) =>
           self.postMessage({
             uid: e.data.uid,
             data,
           });
-        
+
         if (e.data.type === "sleep") {
           const timeout = setTimeout(() => {
             post(e.data.data.duration || 1);
@@ -45,14 +45,15 @@ const worker = function () {
           const springAnimation =
             self.createSpring ||
             (self.createSpring = ({
-              stiffness = 310,
-              damping = 18,
+              tension = 180,
+              friction = 12,
               mass = 1,
-              precision = 0.001,
-              stopAttempt = 3,
+              precision = 0.0001,
+              velocity = 0,
+              stopAttempt = 5,
             } = {}): number[] => {
               const savePath =
-                `${stiffness}-${damping}-${mass}-${precision}-${stopAttempt}`.replace(
+                `${tension}-${friction}-${mass}-${precision}-${stopAttempt}-${velocity}`.replace(
                   /\./g,
                   "-"
                 );
@@ -64,7 +65,7 @@ const worker = function () {
               let current = 0;
               const to = 1;
 
-              let velocity = 0;
+              let _velocity = 0;
               let frames = 0;
               let halt = 0;
               const positions: number[] = [];
@@ -73,13 +74,13 @@ const worker = function () {
               const FPS = 1 / 60;
 
               for (let step = 0; step <= 1000; step += 1) {
-                const springForce = -stiffness * (current - to);
-                const dampingForce = -damping * velocity;
-                const acceleration = (springForce + dampingForce) / mass;
+                const springForce = -tension * (current - to);
+                const frictionForce = -friction * _velocity;
+                const acceleration = (springForce + frictionForce) / mass;
 
-                velocity += acceleration * FPS;
+                _velocity += acceleration * FPS;
 
-                const nextValue = current + velocity * FPS;
+                const nextValue = current + _velocity * FPS;
 
                 const stopping =
                   Math.abs(nextValue - current) <= Math.abs(precision);
@@ -287,6 +288,8 @@ const worker = function () {
               const keyframes = addBrowserKeyframePrefix(
                 `${animName}{${parseFrames(transform, opacity)}}`
               );
+
+              console.log((springValues.length / 60) * 1000);
 
               return (self.saved[savePath] = {
                 keyframes,
