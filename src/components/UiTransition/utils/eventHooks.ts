@@ -2,9 +2,11 @@ import {
   BaseTransitionProps,
   ComputedRef,
   nextTick,
+  Ref,
   RendererElement,
 } from "vue";
-import { DynamicObject } from "../types/utils";
+import { ConfigDirection } from "../types/props/config";
+import { AnimState, DynamicObject } from "../types/utils";
 import asyncWorker from "./asyncWorker";
 import { getAnimSavePath } from "./component";
 import sleep from "./sleep";
@@ -21,39 +23,61 @@ const toggleAnimEvents = (
     });
 };
 
+const setProperty = (
+  el: HTMLElement,
+  styleProps: DynamicObject<string | number | undefined>
+) => {
+  for (const key in styleProps) {
+    const value = styleProps[key];
+
+    if (typeof value != "undefined") {
+      el.style.setProperty(key, `${value}`.replace(/\{|\}/g, ""));
+    }
+  }
+};
+
 export default function eventHooks({
-  tempConfig,
+  configProp,
   keyframes,
   getKeyframeName,
   styleId,
+  animState,
 }: {
-  tempConfig: { delay: any; from: { opacity: any; transform: any } };
+  configProp: ConfigDirection | null;
   keyframes: DynamicObject<number>;
   getKeyframeName: ComputedRef<string>;
   styleId: string;
+  animState: Ref<AnimState>;
 }): BaseTransitionProps {
+  const setAnimState = (arg: AnimState) => (animState.value = arg);
+
+  const handleKeyframeNameExcapeChar = (keyframe: string) =>
+    keyframe.replace(/\\=/, "=");
+
   const beforeAppearOrEnter = (e: RendererElement) => {
+    setAnimState("enter");
+
+    if (!configProp) {
+      return;
+    }
+
     const el = e as unknown as HTMLElement;
 
+    setProperty(el, {
+      "--uit-delay": configProp.delay,
+      "--uit-opacity": configProp.from?.opacity,
+      "--uit-transform": configProp.from?.transform,
+    });
+
     el.classList.add("ui-transition");
-
-    const styleProps: DynamicObject<string | number> = {
-      "--uit-delay": tempConfig.delay,
-      "--uit-opacity": tempConfig.from.opacity,
-      "--uit-transform": tempConfig.from.transform,
-    };
-
-    for (const key in styleProps) {
-      el.style.setProperty(key, `${styleProps[key]}`.replace(/\{|\}/g, ""));
-    }
 
     if (!keyframes[getKeyframeName.value]) {
       asyncWorker({
         type: "spring",
         parse: true,
         data: {
-          ...tempConfig,
-          savePath: getAnimSavePath(tempConfig),
+          ...configProp,
+          savePath: getAnimSavePath(configProp),
           keyframeName: getKeyframeName.value,
         },
       }).then((animObject) => {
@@ -74,27 +98,23 @@ export default function eventHooks({
     e: RendererElement,
     done: (canceled?: boolean) => void
   ) => {
+    setAnimState("enter");
+
+    if (!configProp) {
+      return;
+    }
+
     const el = e as unknown as HTMLElement;
+
     const eventCallback = (evt: AnimationEvent) => {
       if (
         evt.target === evt.currentTarget &&
-        evt.animationName === getKeyframeName.value
+        handleKeyframeNameExcapeChar(evt.animationName) ===
+          handleKeyframeNameExcapeChar(getKeyframeName.value)
       ) {
         const elem = evt.target as unknown as HTMLElement | null;
 
         done(evt.type === "animationcancel");
-
-        [
-          "--uit-anim-duration",
-          "--uit-anim-name",
-          "--uit-delay",
-          "--uit-transform",
-          "--uit-opacity",
-        ].forEach((prop) => {
-          elem?.style.removeProperty(prop);
-        });
-
-        elem?.classList.remove("ui-transition");
 
         toggleAnimEvents("remove", elem, eventCallback);
       }
@@ -105,21 +125,52 @@ export default function eventHooks({
 
       await sleep();
 
-      const styleProps: DynamicObject<string> = {
+      el.addEventListener(
+        "animationstart",
+        (e) => {
+          if (
+            e.target &&
+            el.isSameNode(e.target as HTMLElement) &&
+            handleKeyframeNameExcapeChar(e.animationName) ===
+              handleKeyframeNameExcapeChar(getKeyframeName.value)
+          ) {
+            setProperty(el, {
+              "--uit-opacity": configProp.to?.opacity,
+              "--uit-transform": configProp.to?.transform,
+            });
+          }
+        },
+        { once: true }
+      );
+
+      setProperty(el, {
         "--uit-anim-duration": `${keyframes[getKeyframeName.value]}ms`,
         "--uit-anim-name": getKeyframeName.value,
-      };
-
-      for (const key in styleProps) {
-        el.style.setProperty(key, styleProps[key]);
-      }
+      });
     });
+  };
+
+  const animDone = (e: RendererElement) => {
+    const el = e as unknown as HTMLElement;
+    [
+      "--uit-anim-duration",
+      "--uit-anim-name",
+      "--uit-delay",
+      "--uit-transform",
+      "--uit-opacity",
+    ].forEach((prop) => {
+      el.style.removeProperty(prop);
+    });
+
+    el.classList.remove("ui-transition");
   };
 
   return {
     onBeforeAppear: beforeAppearOrEnter,
     onAppear: appearOrEnter,
+    onAfterAppear: animDone,
     onBeforeEnter: beforeAppearOrEnter,
     onEnter: appearOrEnter,
+    onAfterEnter: animDone,
   };
 }
