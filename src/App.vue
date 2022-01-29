@@ -22,7 +22,6 @@ const show = ref(false);
   </UiTransition>
     </div>
 
-
   <button
     @click="show = !show"
   >
