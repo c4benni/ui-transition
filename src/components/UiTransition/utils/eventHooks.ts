@@ -1,14 +1,8 @@
-import {
-  BaseTransitionProps,
-  ComputedRef,
-  nextTick,
-  Ref,
-  RendererElement,
-} from "vue";
-import { ConfigDirection } from "../types/props/config";
+import { BaseTransitionProps, capitalize, RendererElement } from "vue";
+import { DoneCallback, EventHook, Hook } from "../types/eventHooks";
 import { AnimState, DynamicObject } from "../types/utils";
 import asyncWorker from "./asyncWorker";
-import { getAnimSavePath } from "./component";
+import { getAnimSavePath, kebabCase } from "./component";
 import sleep from "./sleep";
 
 const toggleAnimEvents = (
@@ -23,7 +17,7 @@ const toggleAnimEvents = (
     });
 };
 
-const setProperty = (
+const setProperties = (
   el: HTMLElement,
   styleProps: DynamicObject<string | number | undefined>
 ) => {
@@ -36,37 +30,47 @@ const setProperty = (
   }
 };
 
-export default function eventHooks({
-  configProp,
-  keyframes,
-  getKeyframeName,
-  styleId,
-  animState,
-}: {
-  configProp: ConfigDirection | null;
-  keyframes: DynamicObject<number>;
-  getKeyframeName: ComputedRef<string>;
-  styleId: string;
-  animState: Ref<AnimState>;
-}): BaseTransitionProps {
+const eventHooks: EventHook = function (args) {
+  const {
+    configProp,
+    keyframes,
+    getKeyframeName,
+    styleId,
+    animState,
+    appear,
+    emit,
+  } = args;
+
   const setAnimState = (arg: AnimState) => (animState.value = arg);
 
   const handleKeyframeNameExcapeChar = (keyframe: string) =>
-    keyframe.replace(/\\=/, "=");
+    keyframe.replace(/\\=/g, "=");
 
-  const beforeAppearOrEnter = (e: RendererElement) => {
-    setAnimState("enter");
+  const $emit = (evt: string, args: any[]) => {
+    emit(kebabCase(evt), args);
+    emit(evt, args);
+  };
 
-    if (!configProp) {
+  const getState = (hook: Hook): AnimState =>
+    hook === "leave" ? "leave" : "enter";
+
+  const beforeAnimStart = (e: RendererElement, hook: Hook) => {
+    const state = getState(hook);
+
+    setAnimState(state);
+
+    $emit(`before${capitalize(hook)}`, [e]);
+
+    if (!configProp.value) {
       return;
     }
 
     const el = e as unknown as HTMLElement;
 
-    setProperty(el, {
-      "--uit-delay": configProp.delay,
-      "--uit-opacity": configProp.from?.opacity,
-      "--uit-transform": configProp.from?.transform,
+    setProperties(el, {
+      "--uit-delay": configProp.value.delay,
+      "--uit-opacity": configProp.value.from?.opacity,
+      "--uit-transform": configProp.value.from?.transform,
     });
 
     el.classList.add("ui-transition");
@@ -76,8 +80,8 @@ export default function eventHooks({
         type: "spring",
         parse: true,
         data: {
-          ...configProp,
-          savePath: getAnimSavePath(configProp),
+          ...configProp.value,
+          savePath: getAnimSavePath(configProp.value),
           keyframeName: getKeyframeName.value,
         },
       }).then((animObject) => {
@@ -94,13 +98,18 @@ export default function eventHooks({
     }
   };
 
-  const appearOrEnter = async (
+  const animStart = (
     e: RendererElement,
-    done: (canceled?: boolean) => void
+    done: (cancelled?: boolean) => void,
+    hook: Hook
   ) => {
-    setAnimState("enter");
+    const state = getState(hook);
 
-    if (!configProp) {
+    setAnimState(state);
+
+    $emit(hook, [e]);
+
+    if (!configProp.value) {
       return;
     }
 
@@ -120,11 +129,9 @@ export default function eventHooks({
       }
     };
 
-    nextTick().then(async () => {
-      toggleAnimEvents("add", el, eventCallback);
+    toggleAnimEvents("add", el, eventCallback);
 
-      await sleep();
-
+    sleep().then(() => {
       el.addEventListener(
         "animationstart",
         (e) => {
@@ -134,24 +141,37 @@ export default function eventHooks({
             handleKeyframeNameExcapeChar(e.animationName) ===
               handleKeyframeNameExcapeChar(getKeyframeName.value)
           ) {
-            setProperty(el, {
-              "--uit-opacity": configProp.to?.opacity,
-              "--uit-transform": configProp.to?.transform,
+            setProperties(el, {
+              "--uit-opacity": configProp.value?.to?.opacity,
+              "--uit-transform": configProp.value?.to?.transform,
             });
           }
         },
         { once: true }
       );
 
-      setProperty(el, {
+      setProperties(el, {
         "--uit-anim-duration": `${keyframes[getKeyframeName.value]}ms`,
         "--uit-anim-name": getKeyframeName.value,
       });
     });
   };
 
-  const animDone = (e: RendererElement) => {
+  const animCancelled = (el: RendererElement, hook: Hook) => {
+    $emit(`${hook}Cancelled`, [el]);
+  };
+
+  const animDone = (e: RendererElement, hook: Hook) => {
+    const state = getState(hook);
+
+    setAnimState(state);
+
     const el = e as unknown as HTMLElement;
+
+    $emit(`after${capitalize(hook)}`, [e]);
+
+    el.classList.remove("ui-transition");
+
     [
       "--uit-anim-duration",
       "--uit-anim-name",
@@ -161,16 +181,34 @@ export default function eventHooks({
     ].forEach((prop) => {
       el.style.removeProperty(prop);
     });
+  };
 
-    el.classList.remove("ui-transition");
+  const getHooks = (hook: Hook): BaseTransitionProps => {
+    if (hook === "appear" && !appear) return {};
+
+    const capitalizeHook = capitalize(hook);
+
+    return {
+      [`onBefore${capitalizeHook}`]: (el: RendererElement) => {
+        beforeAnimStart(el, hook);
+      },
+      [`on${capitalizeHook}`]: (el: RendererElement, done: DoneCallback) => {
+        animStart(el, done, hook);
+      },
+      [`on${capitalizeHook}Cancelled`]: (el: RendererElement) => {
+        animCancelled(el, hook);
+      },
+      [`onAfter${capitalizeHook}`]: (el: RendererElement) => {
+        animDone(el, hook);
+      },
+    };
   };
 
   return {
-    onBeforeAppear: beforeAppearOrEnter,
-    onAppear: appearOrEnter,
-    onAfterAppear: animDone,
-    onBeforeEnter: beforeAppearOrEnter,
-    onEnter: appearOrEnter,
-    onAfterEnter: animDone,
+    ...getHooks("appear"),
+    ...getHooks("enter"),
+    ...getHooks("leave"),
   };
-}
+};
+
+export default eventHooks;
