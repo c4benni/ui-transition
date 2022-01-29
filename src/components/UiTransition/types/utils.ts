@@ -9,3 +9,18 @@ export interface GlobalState {
   styleCreated: boolean;
   workerCreated: boolean;
 }
+
+export type AnimState = "enter" | "leave";
+
+export type AnimEvent =
+  | AnimState
+  | "appear"
+  | "beforeEnter"
+  | "beforeLeave"
+  | "beforeAppear"
+  | "afterEnter"
+  | "afterLeave"
+  | "afterAppear"
+  | "appearCancelled"
+  | "enterCancelled"
+  | "leaveCancelled";
