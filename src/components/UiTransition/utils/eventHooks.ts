@@ -7,7 +7,19 @@ import {
 import { DynamicObject } from "../types/utils";
 import asyncWorker from "./asyncWorker";
 import { getAnimSavePath } from "./component";
-import workerBox from "./workerBox";
+import sleep from "./sleep";
+
+const toggleAnimEvents = (
+  action: "add" | "remove",
+  el: HTMLElement | null,
+  callback: (evt: AnimationEvent) => void
+): void => {
+  el &&
+    ["animationend", "animationcancel"].forEach((evt) => {
+      // @ts-ignore
+      el[`${action}EventListener`](evt, callback);
+    });
+};
 
 export default function eventHooks({
   tempConfig,
@@ -84,18 +96,14 @@ export default function eventHooks({
 
         elem?.classList.remove("ui-transition");
 
-        elem?.removeEventListener("animationend", eventCallback);
-        elem?.removeEventListener("animationcancel", eventCallback);
+        toggleAnimEvents("remove", elem, eventCallback);
       }
     };
 
     nextTick().then(async () => {
-      el.addEventListener("animationend", eventCallback);
-      el.addEventListener("animationcancel", eventCallback);
+      toggleAnimEvents("add", el, eventCallback);
 
-      await asyncWorker({
-        type: "sleep",
-      });
+      await sleep();
 
       const styleProps: DynamicObject<string> = {
         "--uit-anim-duration": `${keyframes[getKeyframeName.value]}ms`,
