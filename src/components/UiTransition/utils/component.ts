@@ -2,7 +2,7 @@ import { ConfigDirection } from "../types/props/config";
 import { GlobalState } from "../types/utils";
 
 export function keyframeName(
-  transitionConfig: ConfigDirection,
+  transitionConfig: ConfigDirection | null,
   spring = {
     tension: 250,
     friction: 12,
@@ -11,6 +11,10 @@ export function keyframeName(
     stopAttempt: 10,
   }
 ): string {
+  if (!transitionConfig) {
+    return "";
+  }
+
   const { from, to } = transitionConfig;
 
   let output = "";
@@ -31,7 +35,7 @@ export function keyframeName(
 
   output += `${spring.tension}-${spring.mass}-${spring.friction}-${spring.precision}-${spring.stopAttempt}`;
 
-  return `uit-${btoa(output).replace(/=/g, "/=")}`;
+  return `uit-${btoa(output).replace(/=/g, "\\=")}`;
 }
 
 export function getAnimSavePath(transitionConfig: ConfigDirection) {
