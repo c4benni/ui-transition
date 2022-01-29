@@ -28,6 +28,14 @@ const worker = function () {
             uid: e.data.uid,
             data,
           });
+        
+        if (e.data.type === "sleep") {
+          const timeout = setTimeout(() => {
+            post(e.data.data.duration || 1);
+            clearTimeout(timeout);
+          }, e.data.data.duration || 0);
+          return;
+        }
 
         if (!self.saved) {
           self.saved = {};
