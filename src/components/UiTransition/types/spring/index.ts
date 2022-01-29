@@ -1,6 +1,6 @@
 export interface SpringConfig {
-  damping?: number;
+  friction?: number;
   mass?: number;
   precision?: number;
-  stiffness?: number;
+  tension?: number;
 }
