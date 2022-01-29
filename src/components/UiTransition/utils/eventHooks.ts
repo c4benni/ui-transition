@@ -150,8 +150,6 @@ const eventHooks: EventHook = function (args) {
         { once: true }
       );
 
-      console.log(configProp.value);
-
       const getDuration = () => {
         if (/string|number/.test(typeof configProp.value?.duration)) {
           return parseFloat(`${configProp.value?.duration}`) || 1;
