@@ -19,7 +19,7 @@ export interface ConfigDirection extends ConfigDefaults {
   to?: ConfigTransition;
 }
 
-export interface ConfigAsObject extends ConfigDefaults {
+export interface ConfigAsObject extends ConfigDirection {
   enter?: ConfigDirection;
   leave?: ConfigDirection;
 }
