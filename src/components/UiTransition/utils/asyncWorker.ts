@@ -8,14 +8,14 @@ const asyncWorker: AsyncWorker = function ({ type, data, parse }) {
 
   if (!validWorker) {
     return new Promise((_, reject) => {
-      reject("Invalid worker");
+      reject("Invalid worker, Please report this issue");
     });
   }
 
   const uid = performance.now();
 
   worker.postMessage({
-    name: "ui-transition",
+    name: "uit",
     type,
     parse,
     data: data || {},
