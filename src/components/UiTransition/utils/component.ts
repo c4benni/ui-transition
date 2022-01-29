@@ -4,8 +4,8 @@ import { GlobalState } from "../types/utils";
 export function keyframeName(
   transitionConfig: ConfigDirection,
   spring = {
-    stiffness: 250,
-    damping: 12,
+    tension: 250,
+    friction: 12,
     mass: 5,
     precision: 0.001,
     stopAttempt: 10,
@@ -29,7 +29,7 @@ export function keyframeName(
     output += `tt-${to.transform}-`;
   }
 
-  output += `${spring.stiffness}-${spring.mass}-${spring.damping}-${spring.precision}-${spring.stopAttempt}`;
+  output += `${spring.tension}-${spring.mass}-${spring.friction}-${spring.precision}-${spring.stopAttempt}`;
 
   return `uit-${btoa(output).replace(/=/g, "/=")}`;
 }
@@ -56,18 +56,16 @@ export function nextAnimFrame(): Promise<void> {
 }
 
 export function createStyleNode(globalState: GlobalState): void {
-  if (!globalState.styleCreated) {
-    const styleNode = document.createElement("style");
+  const styleNode = document.createElement("style");
 
-    globalState.styleId = `ui-${performance
-      .now()
-      .toString(36)
-      .replace(/\./g, "-")}`;
+  globalState.styleId = `uit-${performance
+    .now()
+    .toString(36)
+    .replace(/\./g, "-")}`;
 
-    styleNode.id = globalState.styleId;
+  styleNode.id = globalState.styleId;
 
-    (document.head || document.querySelector("head")).append(styleNode);
+  styleNode.setAttribute("data-ui-transition", "");
 
-    globalState.styleCreated = true;
-  }
+  (document.head || document.querySelector("head")).append(styleNode);
 }
