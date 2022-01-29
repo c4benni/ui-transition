@@ -3,4 +3,5 @@ export interface SpringConfig {
   mass?: number;
   precision?: number;
   tension?: number;
+  stopAttempt?: number;
 }
