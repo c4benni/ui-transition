@@ -73,3 +73,7 @@ export function createStyleNode(globalState: GlobalState): void {
 
   (document.head || document.querySelector("head")).append(styleNode);
 }
+
+export function kebabCase(arg: string): string {
+  return arg.replace(/[A-Z]/g, (letter) => `-${letter}`.toLowerCase());
+}
