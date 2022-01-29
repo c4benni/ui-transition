@@ -24,6 +24,6 @@ export interface ConfigAsObject extends ConfigDefaults {
   leave?: ConfigDirection;
 }
 
-type GenericConfig = string | ConfigAsObject;
+export type GenericConfigProp = string | ConfigAsObject;
 
-export type ConfigProp = boolean | GenericConfig | GenericConfig[];
+export type ConfigProp = boolean | GenericConfigProp | GenericConfigProp[];
