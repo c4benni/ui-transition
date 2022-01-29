@@ -145,6 +145,7 @@ const worker = function () {
                     hasUnit: boolean
                   ): Mustache[] =>
                     (str.match(/\{\.?\d+(?:\.\d+)?(?:[a-zA-Z]+|%)?}/g) || [])
+                      // remove any with > 1 dot
                       .filter((str) => !str.match(/\..\./g))
                       .map((str) => {
                         const returnValue: Mustache = {
@@ -188,10 +189,9 @@ const worker = function () {
                   //  clone array so its values can be carefully deleted;
                   const arrayClone = [...array];
 
-                  //  split original to get mustaches; then loop and replace mustache
-                  // with the first arrayClone item; shift that cloneArray item away;
+                  //  split original to get mustaches; then loop and replace mustache with the first arrayClone item; shift that cloneArray item away;
                   const splitted = original
-                    .split(/(\{\d+(?:[a-zA-Z]+)?\})/g)
+                    .split(/(\{(?:\d+?\.?)?\d+(?:[a-zA-Z]+)?\})/g)
                     .map((str) => {
                       if (/^\{/.test(str)) {
                         return arrayClone.shift();
@@ -199,7 +199,7 @@ const worker = function () {
                       return str;
                     });
 
-                  //     join splitted values back and return
+                  // join splitted values back and return
                   return splitted.join("");
                 };
 
@@ -288,8 +288,6 @@ const worker = function () {
               const keyframes = addBrowserKeyframePrefix(
                 `${animName}{${parseFrames(transform, opacity)}}`
               );
-
-              console.log((springValues.length / 60) * 1000);
 
               return (self.saved[savePath] = {
                 keyframes,
