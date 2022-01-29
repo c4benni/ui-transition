@@ -1,6 +1,9 @@
 import { AsyncWorker } from "../types/worker";
+import workerBox from "./workerBox";
 
-const asyncWorker: AsyncWorker = function ({ worker, type, data, parse }) {
+const asyncWorker: AsyncWorker = function ({ type, data, parse }) {
+  const worker = workerBox.webWorker;
+
   const validWorker = worker instanceof Worker;
 
   if (!validWorker) {
@@ -15,7 +18,7 @@ const asyncWorker: AsyncWorker = function ({ worker, type, data, parse }) {
     name: "ui-transition",
     type,
     parse,
-    data,
+    data: data || {},
     uid,
   });
 
