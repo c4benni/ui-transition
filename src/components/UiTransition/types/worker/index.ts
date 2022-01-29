@@ -10,10 +10,9 @@ export interface CreateSpring {
 }
 
 export type AsyncWorker = (arg: {
-  worker: Worker;
-  type: "spring" | "ease";
-  parse: boolean;
-  data: DynamicObject<any>;
+  type: "spring" | "ease" | "sleep";
+  parse?: boolean;
+  data?: DynamicObject<any>;
 }) => Promise<DynamicObject<any>>;
 
 export interface Mustache {
