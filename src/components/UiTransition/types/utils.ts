@@ -24,3 +24,6 @@ export type AnimEvent =
   | "appearCancelled"
   | "enterCancelled"
   | "leaveCancelled";
+
+  export type Emit = (event: string, ...args: any[]) => void;
+  
