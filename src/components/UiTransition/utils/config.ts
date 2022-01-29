@@ -5,27 +5,38 @@ import { DynamicObject } from "../types/utils";
 const animations = ref<AnimConfig>({
   scale: (from = 0, to = 1) => {
     return {
-      enter: {
-        from: {
-          transform: `scale3d({${from}},{${from}},1)`,
-          opacity: "{0}",
-        },
-        to: {
-          transform: `scale3d({${to}},{${to}},1)`,
-          opacity: "{1}",
-        },
+      from: {
+        transform: `scale3d({${from}},{${from}},1)`,
+        opacity: "{0}",
       },
-      leave: {
-        from: {
-          transform: `scale3d({${to}},{${to}},1)`,
-          opacity: "{1}",
-        },
-        to: {
-          transform: `scale3d({${from}},{${from}},1)`,
-          opacity: "{0}",
-        },
+      to: {
+        transform: `scale3d({${to}},{${to}},1)`,
+        opacity: "{1}",
       },
       origin: "center",
+      // duration: 500,
+      spring: {
+        friction: 15,
+        mass: 2,
+        precision: 0.001,
+        tension: 150,
+        stopAttempt: 10,
+      },
+    };
+  },
+
+  slideX: (from = `-100%`, to = '0%') => {
+    return {
+      from: {
+        transform: `translate3d({${from}},0,0)`,
+        opacity: "{0}",
+      },
+      to: {
+        transform: `translate3d({${to}},0,0)`,
+        opacity: "{1}",
+      },
+      origin: "center",
+      // duration: 500,
       spring: {
         friction: 15,
         mass: 2,
