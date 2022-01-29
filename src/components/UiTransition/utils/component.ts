@@ -1,4 +1,5 @@
 import { ConfigDirection } from "../types/props/config";
+import { GlobalState } from "../types/utils";
 
 export function keyframeName(
   transitionConfig: ConfigDirection,
@@ -46,12 +47,27 @@ export function getAnimSavePath(transitionConfig: ConfigDirection) {
     .replace(/\s+/g, "~");
 }
 
-export function sleep(duration: number): Promise<number> {
+export function nextAnimFrame(): Promise<void> {
   return new Promise((resolve) => {
-    const timeout = setTimeout(() => {
-      resolve(duration);
-
-      clearTimeout(timeout);
-    }, duration);
+    requestAnimationFrame(() => {
+      resolve();
+    });
   });
+}
+
+export function createStyleNode(globalState: GlobalState): void {
+  if (!globalState.styleCreated) {
+    const styleNode = document.createElement("style");
+
+    globalState.styleId = `ui-${performance
+      .now()
+      .toString(36)
+      .replace(/\./g, "-")}`;
+
+    styleNode.id = globalState.styleId;
+
+    (document.head || document.querySelector("head")).append(styleNode);
+
+    globalState.styleCreated = true;
+  }
 }
