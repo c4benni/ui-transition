@@ -1,0 +1,3 @@
+# /state
+
+Holds component states.
