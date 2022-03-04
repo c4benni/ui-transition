@@ -1,12 +1,29 @@
+import { SpringObject } from "../../props/types";
+import { AnimPhase, BuildAnim, DynamicObject } from "../../types";
+
+// hold parsed string that could be thousands of chars long as a key to a value of a shorter uuid
+const parsedStrings: DynamicObject<string> = {};
+
 export default function keyframeName(
-  spring = {
-    tension: 250,
-    friction: 12,
-    mass: 5,
-    precision: 0.001,
-    stopAttempt: 10,
-  }
+  config: BuildAnim,
+  spring: SpringObject,
+  animPhase: AnimPhase
 ): string {
-  // TODO
-  return ``;
+  const configString = JSON.stringify({
+    ...config,
+    frame: config.frame.toString(),
+  });
+
+  const springString = JSON.stringify(spring);
+
+  const encrypt = `${configString}-${springString}-${animPhase}`;
+
+  if (parsedStrings[encrypt]) {
+    return parsedStrings[encrypt];
+  }
+
+  return (parsedStrings[encrypt] = `uitKF-${animPhase}-${performance
+    .now()
+    .toString(36)
+    .replace(/\./g, "-")}`);
 }
