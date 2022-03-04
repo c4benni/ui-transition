@@ -1,6 +1,6 @@
 import { AnimPhase, BuildAnim, ConfigProp, Step } from "../../types";
 
-import savedTransitions from "../../state/transitions";
+import transitions from "../../state/transitions";
 
 export default function extractConfig(
   configProp: ConfigProp,
@@ -10,13 +10,13 @@ export default function extractConfig(
     frame: (step: Step, phase: AnimPhase) => {
       const build = {
         enter: {
-          opacity: Math.max(parseFloat(`${step(0, 1)}`), 0),
-          transform: `scale3d(${step(0, 1)}, ${step(0, 1)},1)`,
-          willChange: "transform, opacity",
+          opacity: `${step(0, 1)}`,
+          willChange: "opacity",
         },
 
         leave: {
-          opacity: Math.max(parseFloat(`${step(1, 0)}`), 0),
+          opacity: `${step(1, 0)}`,
+          willChange: "opacity",
         },
       };
 
@@ -30,7 +30,7 @@ export default function extractConfig(
 
     const savedPath = configProp.replace(argsRegExp, "");
 
-    const savedAnim = savedTransitions[savedPath];
+    const savedAnim = transitions[savedPath];
 
     if (!savedAnim) {
       return defaults;
