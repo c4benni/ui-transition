@@ -19,7 +19,8 @@ export default function animStart(
   emit: Emit,
   animPhase: Ref<AnimPhase>,
   configProp: ComputedRef<BuildAnim | null>,
-  getKeyframeName: ComputedRef<string>
+  getKeyframeName: ComputedRef<string>,
+  getDuration: ComputedRef<string>
 ) {
   const { keyframes, waapi } = globalState;
 
@@ -58,7 +59,11 @@ export default function animStart(
     toggleAnimEvents("add", el, eventCallback);
 
     sleep().then(() => {
-      const getDuration = () => {
+      const duration = () => {
+        if (typeof getDuration.value === "string" && !!getDuration.value) {
+          return getDuration.value;
+        }
+
         if (/string|number/.test(typeof configProp.value?.duration)) {
           return parseFloat(`${configProp.value?.duration}`) || 1;
         }
@@ -66,7 +71,7 @@ export default function animStart(
       };
 
       setProperties(el, {
-        "--uit-anim-duration": `${getDuration()}ms`,
+        "--uit-anim-duration": `${duration()}ms`,
         "--uit-anim-name": getKeyframeName.value,
       });
     });
