@@ -10,6 +10,5 @@ export default function createWorker(): Worker {
   return new Worker(url, {
     name: "ui-transition-worker",
     credentials: "same-origin",
-    type: "module",
   });
 }
