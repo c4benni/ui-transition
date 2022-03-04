@@ -1,9 +1,11 @@
+import { BuildAnim, DynamicObject } from "../types";
+
 declare global {
   interface Window {
     createSpring?: () => number[];
-    saved: {
-      [key: string]: any;
-    };
+    saved: DynamicObject<any>;
+    transitions: DynamicObject<(...args: any[]) => BuildAnim>;
+    methods: DynamicObject<any>;
   }
 }
 
@@ -37,7 +39,34 @@ const worker = function () {
             }, duration);
           } else await Promise.resolve();
 
-          post(duration);
+          return post(duration);
+        }
+
+        // handle addition of methods
+        if (type === "addMethod") {
+          if (!self.methods) {
+            self.methods = {};
+          }
+
+          // loop through the methods recieved, and assign to the self.methods
+          for (const key in data) {
+            self.methods[key] = new Function(`return ${data[key]}`)();
+          }
+
+          return post(true);
+        }
+
+        // handle addition of transitions
+        if (type === "addTransition") {
+          if (!self.transitions) {
+            self.transitions = {};
+          }
+
+          for (const key in data) {
+            const anim = new Function(`return ${data[key]}`)();
+
+            self.transitions[key] = anim;
+          }
 
           return;
         }
@@ -151,13 +180,16 @@ const worker = function () {
             return post(self.saved[savePath]);
           }
 
-          const returnFunction = new Function(`return ${data.frame}`);
+          const getFrame = self.methods.extractConfig(
+            data.buildAnim,
+            data.animPhase
+          ).frame;
 
           const stepper = (from: number, to: number, frame: number) =>
             (from - to) * frame + to;
 
           // interpolate values with `springValues`
-          const getReturnFunction = returnFunction();
+          const getReturnFunction = getFrame;
 
           const calculateSteps = (
             from: number | number[],
