@@ -1,10 +1,18 @@
 import { capitalize, ComputedRef, Ref, RendererElement } from "vue";
 import { SpringObject } from "../../../props/types";
 import { globalState } from "../../../state";
-import { AnimPhase, BuildAnim, DynamicObject, Emit } from "../../../types";
+import {
+  AnimPhase,
+  BuildAnim,
+  ConfigProp,
+  DynamicObject,
+  Emit,
+} from "../../../types";
 import asyncWorker from "../../../worker/asyncWorker";
 import { Hook, UiTransitionElement } from "../types";
 import { $emit, getState, setAnimState, setProperties } from "../utils";
+import hasWaapi from "./hasWaapi";
+import noWaapi from "./noWaapi";
 
 export default function beforeAnimStart(
   e: RendererElement,
@@ -16,11 +24,12 @@ export default function beforeAnimStart(
   getDuration: ComputedRef<string>,
   getDelay: ComputedRef<string>,
   getEase: ComputedRef<string>,
-  getSpring: ComputedRef<SpringObject>
+  getSpring: ComputedRef<SpringObject>,
+  propsConfig: ConfigProp
 ) {
   const state = getState(hook);
 
-  const { styleId, keyframes, waapi } = globalState;
+  const { waapi } = globalState;
 
   setAnimState(state, animPhase);
 
@@ -68,70 +77,32 @@ export default function beforeAnimStart(
     }
   };
 
-  asyncWorker({
-    type: "spring",
-    data: {
-      ...configProp.value,
-      frame: configProp.value.frame.toString(),
-      // TODO:  savePath: getAnimSavePath(configProp.value),
-      keyframeName: getKeyframeName.value,
-      waapi,
-      animPhase: animPhase.value,
-      config: getSpring.value,
-    },
-  }).then((animObject) => {
-    const {
-      data: { cssText, duration },
-    } = animObject;
+  const createSpring = async (): Promise<DynamicObject<any>> => {
+    if (!configProp.value) return Promise.resolve({});
 
-    console.log(duration);
+    return asyncWorker({
+      type: "spring",
+      data: {
+        buildAnim: propsConfig,
+        // TODO:  savePath: getAnimSavePath(configProp.value),
+        keyframeName: getKeyframeName.value,
+        waapi,
+        animPhase: animPhase.value,
+        config: getSpring.value,
+      },
+    });
+  };
 
-    if (!waapi) {
-      if (!keyframes[getKeyframeName.value]) {
-        keyframes[getKeyframeName.value] = duration;
-
-        const styleTag = document.getElementById(`${styleId}`);
-
-        if (styleTag) {
-          styleTag.innerText += cssText;
-        }
-      }
-    } else {
-      const animDuration = getDuration.value || duration;
-
-      const anim = el.animate(cssText, {
-        duration: parseFloat(animDuration),
-        easing: getEase.value,
-        delay,
-      });
-
-      anim.addEventListener(
-        "finish",
-        () => {
-          el.__done?.();
-
-          resetPreviousStyles();
-        },
-        { once: true }
-      );
-
-      anim.addEventListener(
-        "cancel",
-        () => {
-          el.__done?.(true);
-
-          resetPreviousStyles();
-        },
-        { once: true }
-      );
-
-      if (delay) {
-        const timeout = setTimeout(() => {
-          resetPreviousStyles();
-
-          clearTimeout(timeout);
-        }, delay);
-      } else resetPreviousStyles();
-    }
-  });
+  if (waapi) {
+    hasWaapi(
+      createSpring,
+      getDuration.value,
+      el,
+      getEase.value,
+      delay,
+      resetPreviousStyles
+    );
+  } else {
+    noWaapi(getKeyframeName.value, createSpring, el, resetPreviousStyles);
+  }
 }

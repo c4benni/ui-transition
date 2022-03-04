@@ -18,6 +18,7 @@ const eventHooks: EventHook = function (args) {
     getDuration,
     getEase,
     getSpring,
+    propsConfig,
   } = args;
 
   // create event hooks.
@@ -39,12 +40,22 @@ const eventHooks: EventHook = function (args) {
           getDuration,
           getDelay,
           getEase,
-          getSpring
+          getSpring,
+          propsConfig
         );
       },
 
       [`on${capitalizeHook}`]: (el: RendererElement, done: DoneCallback) => {
-        animStart(el, done, hook, emit, animPhase, configProp, getKeyframeName);
+        animStart(
+          el,
+          done,
+          hook,
+          emit,
+          animPhase,
+          configProp,
+          getKeyframeName,
+          getDuration
+        );
       },
 
       [`on${capitalizeHook}cancelled`]: (el: RendererElement) => {
