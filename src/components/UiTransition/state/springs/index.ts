@@ -2,8 +2,8 @@ import { SpringPreset } from "./types";
 
 const springPreset: SpringPreset = {
   default: {
-    tension: 170,
-    friction: 26,
+    tension: 320,
+    friction: 25,
     mass: 1,
     precision: 0.01,
     velocity: 0,
@@ -16,7 +16,7 @@ const springPreset: SpringPreset = {
     mass: 1,
     precision: 0.01,
     velocity: 0,
-    stopAttempt: 20,
+    stopAttempt: 30,
   },
 
   gentle: {
