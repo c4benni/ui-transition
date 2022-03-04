@@ -1,11 +1,21 @@
 import { onBeforeMount } from "vue";
 import createWorker from "../../worker/createWorker";
 import { globalState } from "../../state";
+import asyncWorker from "../../worker/asyncWorker";
+import extractConfig from "../../utils/extractConfig";
+import transitions from "../../state/transitions";
+import { BuildAnim, DynamicObject } from "../../types";
 
 type CreateStyleTag = () => string;
 
 const createStyleTag: CreateStyleTag = () => {
-  const id = `uit-style-${performance.now()}`.replace(/\./g, "-");
+  const id = `uit-style-${performance.now().toString(36).replace(/\./g, "-")}`;
+
+  const existingStyleEl = document.getElementById(id);
+
+  if (existingStyleEl) {
+    existingStyleEl.remove();
+  }
 
   const style = document.createElement("style");
 
@@ -30,7 +40,31 @@ export default function beforeMount() {
       }
 
       // create worker
-      globalState.webWorker = createWorker();
+      if (!globalState.webWorker) {
+        globalState.webWorker = createWorker();
+
+        // send methods to worker
+        asyncWorker({
+          type: "addMethod",
+          data: {
+            extractConfig: extractConfig.toString(),
+          },
+        });
+
+        // send saved transitions to worker
+
+        // store parsed transitions
+        const parsedTransitions: DynamicObject<string> = {};
+
+        for (const key in transitions) {
+          parsedTransitions[key] = transitions[key].toString();
+        }
+
+        asyncWorker({
+          type: "addTransition",
+          data: parsedTransitions,
+        });
+      }
     });
   }
 }
