@@ -7,7 +7,7 @@ export interface DynamicObject<T> {
 export type AnimPhase = "enter" | "leave";
 
 export type AnimPhaseObject<T> = {
-  [key in AnimPhase]: T;
+  [key in AnimPhase]?: T;
 };
 
 export type Step = (

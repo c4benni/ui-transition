@@ -1,4 +1,4 @@
-import { DynamicObject } from "../types";
+import { BuildAnim, DynamicObject } from "../types";
 
 export interface GlobalState {
   styleId: string;
@@ -8,3 +8,5 @@ export interface GlobalState {
   init: boolean;
   keyframes: DynamicObject<number>;
 }
+
+export type ConstructAnim = (...args: any[]) => BuildAnim;
