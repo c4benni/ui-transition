@@ -1,5 +1,5 @@
-import { AsyncWorker } from "../types";
 import { globalState } from "../../state";
+import { AsyncWorker } from "./types";
 
 const asyncWorker: AsyncWorker = function ({ type, data }) {
   const worker = globalState.webWorker;
