@@ -36,8 +36,6 @@ export default defineComponent({
       extractConfig(props.value.config, animPhase.value)
     );
 
-    const getKeyframeName = computed(() => keyframeName());
-
     const getDuration = computed(() =>
       extractDurationAndDelay(
         props.value.duration,
@@ -62,6 +60,10 @@ export default defineComponent({
       extractSpring(props.value.spring, getConfig.value.spring, animPhase.value)
     );
 
+    const getKeyframeName = computed(() =>
+      keyframeName(getConfig.value, getSpring.value, animPhase.value)
+    );
+
     beforeMount();
 
     return function () {
@@ -82,6 +84,7 @@ export default defineComponent({
             getDelay,
             getEase,
             getSpring,
+            propsConfig: props.value.config,
           }),
         } as TransitionProps,
       };
