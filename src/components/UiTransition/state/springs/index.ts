@@ -1,4 +1,4 @@
-import { SpringPreset } from "./types";
+import { AddSpring, SpringPreset } from "./types";
 
 const springPreset: SpringPreset = {
   default: {
@@ -19,6 +19,15 @@ const springPreset: SpringPreset = {
     stopAttempt: 30,
   },
 
+  jello: {
+    tension: 220,
+    friction: 6,
+    mass: 1,
+    precision: 0.01,
+    velocity: 0,
+    stopAttempt: 50,
+  },
+
   gentle: {
     tension: 120,
     friction: 14,
@@ -29,7 +38,7 @@ const springPreset: SpringPreset = {
   },
 
   stiff: {
-    tension: 210,
+    tension: 160,
     friction: 20,
     mass: 1,
     precision: 0.01,
@@ -48,3 +57,18 @@ const springPreset: SpringPreset = {
 };
 
 export default springPreset;
+
+export function addSpring(name: string, config: AddSpring): void {
+  let extended = {};
+
+  if (typeof config.extends === "string" && springPreset[config.extends]) {
+    extended = springPreset[config.extends];
+  }
+
+  delete config.extends;
+
+  springPreset[name] = {
+    ...extended,
+    ...config,
+  };
+}
