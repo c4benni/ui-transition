@@ -10,7 +10,7 @@ export default function extractSpring(
   const getValue = (priority: Spring | undefined): SpringObject | null => {
     if (typeof priority !== "undefined") {
       if (typeof priority === "string") {
-        return springPreset[priority] || null;
+        return springPreset[priority.toLowerCase()] || null;
       }
 
       if (typeof priority === "object") {
@@ -21,7 +21,7 @@ export default function extractSpring(
         if (value) {
           if (typeof value === "string") {
             //   @ts-ignore
-            return springPreset[value] || null;
+            return springPreset[value.toLowerCase()] || null;
           }
 
           if (typeof value === "object") {
