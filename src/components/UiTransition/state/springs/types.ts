@@ -1,5 +1,9 @@
-import { SpringObject, SpringPath } from "../../props/types";
+import { SpringObject } from "../../props/types";
+import { DynamicObject } from "../../types";
 
-export type SpringPreset = {
-  [key in SpringPath]: SpringObject;
-};
+export type SpringPreset = DynamicObject<SpringObject>;
+
+// add a new spring with an extend option
+export interface AddSpring extends SpringObject {
+  extends?: string;
+}
