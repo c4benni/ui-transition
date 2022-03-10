@@ -11,7 +11,7 @@ export const setProperties = (
     const value = styleProps[key];
 
     if (typeof value != "undefined") {
-      el.style.setProperty(key, `${value}`.replace(/\{|\}/g, ""));
+      el.style.setProperty(key, `${value}`, "important");
     }
   }
 };
