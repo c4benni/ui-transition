@@ -43,15 +43,6 @@ export default function beforeAnimStart(
 
   const el = e as unknown as UiTransitionElement;
 
-  // setup el if there's no waapi instance
-  if (!waapi) {
-    setProperties(el, {
-      "--uit-delay": `${delay}ms`,
-    });
-
-    el.classList.add("ui-transition");
-  }
-
   // get first frame of the transition. This value is an object.
   const firstFrame = configProp.value.frame(
     (from: number | number[], _: number | number[]) => from,
@@ -67,6 +58,15 @@ export default function beforeAnimStart(
   }
 
   setProperties(el, firstFrame);
+
+  // setup el if there's no waapi instance
+  if (!waapi) {
+    setProperties(el, {
+      "--uit-delay": `${delay}ms`,
+    });
+
+    el.classList.add("ui-transition");
+  }
 
   const resetPreviousStyles = () => {
     // clear previous styles
