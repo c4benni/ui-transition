@@ -75,7 +75,7 @@ This is where `<UiTransition />` comes in 👨‍🏫. `<UiTransition />` uses t
 
 ## Props
 
-### `config`
+### - `config`
 
 This is where all the magic happens. A dynamic prop that accepts different types. If `false` is passed here, no animation will be used.
 
@@ -154,7 +154,7 @@ type SpringObject = {
 
 <!-- TODO: spring -->
 
-### `delay`
+### - `delay`
 
 Set animation delay.
 
@@ -162,7 +162,7 @@ Set animation delay.
 
 `number` | `{enter?: number; leave?: number}`
 
-### `duration`
+### - `duration`
 
 Control how long your spring animations should last!
 
@@ -172,7 +172,7 @@ Control how long your spring animations should last!
 
 `number` | `{enter?: number; leave?: number}`
 
-### `ease`
+### - `ease`
 
 Control the easing curve of your spring animation! Use css easings like `ease-out`, or a cubic bezier function to add more dynamics to your animations!
 
@@ -186,7 +186,7 @@ Control the easing curve of your spring animation! Use css easings like `ease-ou
 
 `'linear'`
 
-### `group`
+### - `group`
 
 Used to set the underlying component to `<TransitionGroup />` rather than default `<Transition />`
 
@@ -196,7 +196,7 @@ Used to set the underlying component to `<TransitionGroup />` rather than defaul
 
 `boolean`
 
-### `retainFinalStyle`
+### - `retainFinalStyle`
 
 Useful when you need an element to stay in its final animation position. Default behavior is to remove all animation styles applied.
 
