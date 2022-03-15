@@ -79,7 +79,7 @@ This is where `<UiTransition />` comes in 👨‍🏫. `<UiTransition />` uses t
 
 This is where all the magic happens. A dynamic prop that accepts different types. If `false` is passed here, no animation will be used.
 
-#### `propType`
+##### `propType`
 
 `string | boolean | BuildAnim`
 
@@ -148,7 +148,7 @@ type SpringObject = {
 </div>
 </details>
 
-#### `default`
+##### `default`
 
 `'fade'`
 
@@ -158,7 +158,7 @@ type SpringObject = {
 
 Set animation delay.
 
-#### `propType`
+##### `propType`
 
 `number` | `{enter?: number; leave?: number}`
 
@@ -168,7 +168,7 @@ Control how long your spring animations should last!
 
 > Leave `undefined` for the default spring feel
 
-#### `propType`
+##### `propType`
 
 `number` | `{enter?: number; leave?: number}`
 
@@ -178,11 +178,11 @@ Control the easing curve of your spring animation! Use css easings like `ease-ou
 
 > Use `'linear'` for the default spring feel
 
-#### `propType`
+##### `propType`
 
 `string` | `{enter?: string; leave?: string}`
 
-#### `default`
+##### `default`
 
 `'linear'`
 
@@ -192,7 +192,7 @@ Used to set the underlying component to `<TransitionGroup />` rather than defaul
 
 > Read more about Vue's `<TransitionGroup />` [here](https://vuejs.org/api/built-in-components.html#transitiongroup)
 
-#### `propType`
+##### `propType`
 
 `boolean`
 
@@ -200,6 +200,6 @@ Used to set the underlying component to `<TransitionGroup />` rather than defaul
 
 Useful when you need an element to stay in its final animation position. Default behavior is to remove all animation styles applied.
 
-#### `propType`
+##### `propType`
 
 `boolean`
