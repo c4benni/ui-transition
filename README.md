@@ -147,3 +147,59 @@ type SpringObject = {
 
 </div>
 </details>
+
+#### `default`
+
+`'fade'`
+
+<!-- TODO: spring -->
+
+### `delay`
+
+Set animation delay.
+
+#### `propType`
+
+`number` | `{enter?: number; leave?: number}`
+
+### `duration`
+
+Control how long your spring animations should last!
+
+> Leave `undefined` for the default spring feel
+
+#### `propType`
+
+`number` | `{enter?: number; leave?: number}`
+
+### `ease`
+
+Control the easing curve of your spring animation! Use css easings like `ease-out`, or a cubic bezier function to add more dynamics to your animations!
+
+> Use `'linear'` for the default spring feel
+
+#### `propType`
+
+`string` | `{enter?: string; leave?: string}`
+
+#### `default`
+
+`'linear'`
+
+### `group`
+
+Used to set the underlying component to `<TransitionGroup />` rather than default `<Transition />`
+
+> Read more about Vue's `<TransitionGroup />` [here](https://vuejs.org/api/built-in-components.html#transitiongroup)
+
+#### `propType`
+
+`boolean`
+
+### `retainFinalStyle`
+
+Useful when you need an element to stay in its final animation position. Default behavior is to remove all animation styles applied.
+
+#### `propType`
+
+`boolean`
