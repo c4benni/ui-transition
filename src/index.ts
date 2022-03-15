@@ -93,8 +93,6 @@ export default function install(app: App, config: InstallOptions = {}) {
       }
     };
 
-    console.log(options.globals);
-
     for (const value of options.globals as DynamicObject<string>[]) {
       setGlobalValue(value);
     }

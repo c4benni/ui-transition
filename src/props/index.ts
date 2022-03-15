@@ -95,4 +95,9 @@ export default {
     type: [String, Object] as PropType<Spring>,
     default: props.spring,
   },
+
+  retainFinalStyle: {
+    type: Boolean,
+    default: props.retainFinalStyle,
+  },
 };

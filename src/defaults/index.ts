@@ -22,6 +22,7 @@ export const props: Props = {
   group: false,
   mode: "out-in",
   spring: "wobbly",
+  retainFinalStyle: false,
 };
 
 export const options: Options = {

@@ -20,6 +20,7 @@ const eventHooks: EventHook = function (args) {
     getSpring,
     propsConfig,
     fragment,
+    retainFinalStyle,
   } = args;
 
   // create event hooks.
@@ -68,7 +69,7 @@ const eventHooks: EventHook = function (args) {
           }),
 
       [`onAfter${capitalizeHook}`]: (el: RendererElement) => {
-        animDone(el, hook, emit, animPhase);
+        animDone(el, hook, emit, animPhase, configProp, retainFinalStyle);
       },
     };
   };

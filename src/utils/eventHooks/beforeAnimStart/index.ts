@@ -69,12 +69,12 @@ export default function beforeAnimStart(
   // store previous styles before setting first frame
   if (!el.__previousStyles) {
     el.__previousStyles = {};
-    for (const key in firstFrame) {
+    for (const key in lastFrame) {
       el.__previousStyles[key] = el.style.getPropertyValue(key);
     }
   }
 
-  // setProperties(el, lastFrame);
+  setProperties(el, lastFrame);
   setProperties(el, firstFrame);
 
   // setup el if there's no waapi instance
@@ -89,10 +89,22 @@ export default function beforeAnimStart(
   const createSpring = async (): Promise<DynamicObject<any>> => {
     if (!configProp.value) return Promise.resolve({});
 
+    // make frame() to be a string
+    const buildAnim = () => {
+      if (typeof propsConfig === "object" && propsConfig.frame) {
+        return {
+          ...propsConfig,
+          frame: propsConfig.frame.toString(),
+        };
+      }
+
+      return propsConfig;
+    };
+
     return asyncWorker({
       type: "spring",
       data: {
-        buildAnim: propsConfig,
+        buildAnim: buildAnim(),
         // TODO:  savePath: getAnimSavePath(configProp.value),
         keyframeName: getKeyframeName.value,
         waapi,

@@ -20,6 +20,7 @@ export type EventHook = (arg: {
   getSpring: ComputedRef<SpringObject>;
   propsConfig: ConfigProp;
   fragment: ComputedRef<boolean>;
+  retainFinalStyle: boolean;
 }) => BaseTransitionProps;
 
 export type Hook = "appear" | "enter" | "leave";

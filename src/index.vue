@@ -1,4 +1,6 @@
 <script lang="ts">
+import { onBeforeMount } from "vue";
+
 import { computed, defineComponent, ref } from "vue";
 
 import props from "./props";
@@ -69,7 +71,7 @@ export default defineComponent({
       return props.value.group && !props.value.tag;
     });
 
-    beforeMount();
+    onBeforeMount(beforeMount);
 
     return function () {
       const transitionElArgs = {
@@ -104,6 +106,7 @@ export default defineComponent({
             getSpring,
             propsConfig: props.value.config,
             fragment,
+            retainFinalStyle: props.value.retainFinalStyle,
           }),
         } as TransitionElProps,
       };

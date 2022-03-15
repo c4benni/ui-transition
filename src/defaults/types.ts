@@ -22,6 +22,7 @@ export interface Props {
   mode?: Mode;
   spring?: Spring;
   tag?: string;
+  retainFinalStyle?: boolean;
 }
 
 export interface Options {

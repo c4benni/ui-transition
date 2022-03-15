@@ -6,6 +6,14 @@ export default function extractConfig(
   configProp: ConfigProp,
   animPhase: AnimPhase
 ): BuildAnim {
+  if (!configProp) {
+    return {
+      frame: () => ({}),
+      duration: 0,
+      delay: 0,
+    };
+  }
+
   const defaults = {
     frame: (step: Step, phase: AnimPhase) => {
       const build = {
@@ -82,7 +90,7 @@ export default function extractConfig(
 
     let currentAnimPhase = {};
 
-    if (configProp[animPhase]) {
+    if (typeof configProp[animPhase] !== "undefined") {
       currentAnimPhase = extractConfig(configProp[animPhase] || "", animPhase);
     }
 

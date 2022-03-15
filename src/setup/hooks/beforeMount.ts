@@ -1,4 +1,3 @@
-import { onBeforeMount } from "vue";
 import createWorker from "../../worker/createWorker";
 import { globalState } from "../../state";
 import asyncWorker from "../../worker/asyncWorker";
@@ -36,30 +35,28 @@ export default function beforeMount() {
   if (!globalState.init) {
     globalState.init = true;
 
-    onBeforeMount(() => {
-      // set globalState.waapi
-      globalState.waapi = typeof HTMLElement.prototype.animate === "function";
+    // set globalState.waapi
+    globalState.waapi = typeof HTMLElement.prototype.animate === "function";
 
-      // or create a style tag.
-      if (!globalState.waapi) {
-        globalState.styleId = createStyleTag();
-      }
+    // or create a style tag.
+    if (!globalState.waapi) {
+      globalState.styleId = createStyleTag();
+    }
 
-      // create worker
-      if (!globalState.webWorker) {
-        globalState.webWorker = createWorker();
+    // create worker
+    if (!globalState.webWorker) {
+      globalState.webWorker = createWorker();
 
-        // send methods to worker
-        asyncWorker({
-          type: "addMethod",
-          data: {
-            extractConfig: extractConfig.toString(),
-          },
-        });
+      // send methods to worker
+      asyncWorker({
+        type: "addMethod",
+        data: {
+          extractConfig: extractConfig.toString(),
+        },
+      });
 
-        // send saved transitions to worker
-        updateWorkerTransition(transitions);
-      }
-    });
+      // send saved transitions to worker
+      updateWorkerTransition(transitions);
+    }
   }
 }
