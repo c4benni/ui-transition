@@ -8,11 +8,12 @@ let transitions = {
       frame: (step, phase) => {
         const build = {
           enter: {
-            opacity: `${step(0, to)}`,
-            transform: `scale3d(${step(from, to)}, ${step(from, to)}, 1)`,
+            opacity: `${step(from, to)}`,
+            willChange: "opacity",
           },
           leave: {
             opacity: `${step(to, from)}`,
+            willChange: "opacity",
           },
         };
 

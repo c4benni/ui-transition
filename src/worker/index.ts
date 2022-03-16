@@ -268,24 +268,28 @@ const worker = function () {
                 ? new Function(`return ${getFrame}`)()
                 : getFrame;
 
-            const springs = springValues.map((frame) => {
-              const val = getReturnFunction(
-                (from: number | number[], to: number | number[]) =>
-                  calculateSteps(from, to, frame),
-                data.animPhase
-              );
+            const springs = springValues
+              .map((frame) => {
+                const val = getReturnFunction(
+                  (from: number | number[], to: number | number[]) =>
+                    calculateSteps(from, to, frame),
+                  data.animPhase
+                );
 
-              return val;
-            });
+                return val;
+              })
+              .filter((x) => Object.keys(x).length);
 
             let duration;
 
             // set duration if client is trying to create keyframes
-            duration = (springValues.length / 60) * 1000;
+            duration = (springs.length / 60) * 1000;
 
             // create keyframes
-            if (!data.waapi) {
-              let cssText = `@keyframes ${data.keyframeName}{`;
+            let cssText = "";
+
+            if (springs.length) {
+              cssText = `@keyframes ${data.keyframeName}{`;
 
               // helper to get the current frame index (keyframe %)
               const frameIndex = (length: number, index: number): number =>
@@ -310,21 +314,14 @@ const worker = function () {
               }
 
               cssText += "}";
-
-              return post(
-                (self.saved[savePath] = {
-                  cssText,
-                  duration,
-                })
-              );
-            } else {
-              return post(
-                (self.saved[savePath] = {
-                  cssText: springs,
-                  duration,
-                })
-              );
             }
+
+            return post(
+              (self.saved[savePath] = {
+                cssText,
+                duration,
+              })
+            );
           }
         }
       } catch (err) {

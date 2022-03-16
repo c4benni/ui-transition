@@ -13,7 +13,6 @@ const eventHooks: EventHook = function (args) {
     getKeyframeName,
     animPhase,
     appear,
-    emit,
     getDelay,
     getDuration,
     getEase,
@@ -36,7 +35,6 @@ const eventHooks: EventHook = function (args) {
           el,
           hook,
           animPhase,
-          emit,
           configProp,
           getKeyframeName,
           getDuration,
@@ -52,7 +50,6 @@ const eventHooks: EventHook = function (args) {
           el,
           done,
           hook,
-          emit,
           animPhase,
           configProp,
           getKeyframeName,
@@ -64,12 +61,12 @@ const eventHooks: EventHook = function (args) {
         ? {}
         : {
             [`on${capitalizeHook}cancelled`]: (el: RendererElement) => {
-              animcancelled(el, hook, emit);
+              animcancelled(el, hook);
             },
           }),
 
       [`onAfter${capitalizeHook}`]: (el: RendererElement) => {
-        animDone(el, hook, emit, animPhase, configProp, retainFinalStyle);
+        animDone(el, hook, animPhase, configProp, retainFinalStyle);
       },
     };
   };

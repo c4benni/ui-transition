@@ -1,6 +1,6 @@
 import { Ref, RendererElement } from "vue";
 import { kebabCase } from "..";
-import { AnimPhase, DynamicObject, Emit } from "../../types";
+import { AnimPhase, DynamicObject } from "../../types";
 import { Hook, UiTransitionElement } from "./types";
 import { globalState } from "../../state";
 
@@ -35,27 +35,17 @@ export const getState = (hook: Hook): AnimPhase =>
 export const setAnimState = (arg: AnimPhase, animPhase: Ref<string>) =>
   (animPhase.value = arg);
 
-// emit events as camelCase, and kebab-case; so it could easily work with both templates, and render functions.
-export const $emit = (emit: Emit, evt: string, args: any[]) => {
-  emit(kebabCase(evt), args);
-  emit(evt, args);
-};
-
 export function resetEl(e: RendererElement) {
-  const { waapi } = globalState;
+  const el = e as unknown as UiTransitionElement;
 
-  if (!waapi) {
-    const el = e as unknown as UiTransitionElement;
+  el.classList.remove("ui-transition", "ui-transition-paused");
 
-    el.classList.remove("ui-transition");
-
-    [
-      "--uit-anim-duration",
-      "--uit-anim-name",
-      "--uit-delay",
-      "--uit-ease",
-    ].forEach((prop) => {
-      el.style.removeProperty(prop);
-    });
-  }
+  [
+    "--uit-anim-duration",
+    "--uit-anim-name",
+    "--uit-delay",
+    "--uit-ease",
+  ].forEach((prop) => {
+    el.style.removeProperty(prop);
+  });
 }

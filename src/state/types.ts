@@ -4,9 +4,8 @@ export interface GlobalState {
   styleId: string;
   styleCreated: boolean;
   webWorker: null | Worker;
-  waapi: boolean;
   init: boolean;
-  keyframes: DynamicObject<number>;
+  keyframes: DynamicObject<number | string>;
 }
 
 export type ConstructAnim = (...args: any[]) => BuildAnim;

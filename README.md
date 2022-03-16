@@ -71,7 +71,7 @@ I'm a big fan of smooth transitioning with a natural feel for DOM nodes. This li
 <br>
 To be honest, [`raf`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) won't achive that kind of performance, even when animating composite properties (transform, opacity). If you need to make a bulky request, be ready for some janky animations.
 <br>
-This is where `<UiTransition />` comes in 👨‍🏫. `<UiTransition />` uses the [`WAAPI`](https://developer.mozilla.org/en-US/docs/Web/API/Web_Animations_API) if it is available, and falls back to using `CSS Keyframes`. Keyframes uses [off main thread animation](https://developer.mozilla.org/en-US/docs/Web/Performance/CSS_JavaScript_animation_performance#off_main_thread_animation) so you can be sure to do CPU draining tasks with your DOM node on the main thread, without having it interupted with calculations on every frame to create _spring animations_, ensuring a butter smooth animation with a natural feel.
+This is where `<UiTransition />` comes in 👨‍🏫. `<UiTransition />` uses `CSS Keyframes` which utilizes [off main thread animation](https://developer.mozilla.org/en-US/docs/Web/Performance/CSS_JavaScript_animation_performance#off_main_thread_animation) so you can be sure to do CPU draining tasks with your DOM node on the main thread, without having it interupted with calculations on every frame to create _spring animations_, ensuring a butter smooth animation with a natural feel.
 
 ## Props
 

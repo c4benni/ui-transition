@@ -34,13 +34,11 @@ export interface Anim {
 }
 
 export interface BuildAnim extends Anim {
-  enter?: Anim;
-  leave?: Anim;
+  enter?: Anim | boolean;
+  leave?: Anim | boolean;
 }
 
 export type ConfigProp = BuildAnim | string | boolean;
-
-export type Emit = (event: string, ...args: any[]) => void;
 
 export interface InstallOptions {
   componentName?: string;

@@ -1,18 +1,11 @@
-import { capitalize, ComputedRef, Ref, RendererElement } from "vue";
-import { AnimPhase, BuildAnim, Emit } from "../../../types";
+import { ComputedRef, Ref, RendererElement } from "vue";
+import { AnimPhase, BuildAnim } from "../../../types";
 import { Hook, UiTransitionElement } from "../types";
-import {
-  $emit,
-  getState,
-  resetEl,
-  setAnimState,
-  setProperties,
-} from "../utils";
+import { getState, resetEl, setAnimState, setProperties } from "../utils";
 
 export default function animDone(
   e: RendererElement,
   hook: Hook,
-  emit: Emit,
   animPhase: Ref<AnimPhase>,
   configProp: ComputedRef<BuildAnim | null>,
   retainFinalStyle: boolean
@@ -21,11 +14,9 @@ export default function animDone(
 
   setAnimState(state, animPhase);
 
-  $emit(emit, `after${capitalize(hook)}`, [e]);
-
   resetEl(e);
 
-  if (retainFinalStyle && configProp.value) {
+  if (retainFinalStyle && configProp.value && animPhase.value === "enter") {
     const el = e as unknown as UiTransitionElement;
 
     const lastFrame = configProp.value.frame(

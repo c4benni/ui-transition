@@ -35,13 +35,7 @@ export default function beforeMount() {
   if (!globalState.init) {
     globalState.init = true;
 
-    // set globalState.waapi
-    globalState.waapi = typeof HTMLElement.prototype.animate === "function";
-
-    // or create a style tag.
-    if (!globalState.waapi) {
-      globalState.styleId = createStyleTag();
-    }
+    globalState.styleId = createStyleTag();
 
     // create worker
     if (!globalState.webWorker) {

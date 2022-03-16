@@ -1,19 +1,12 @@
 import { BaseTransitionProps, ComputedRef, Ref } from "vue";
 import { SpringObject } from "../../props/types";
-import {
-  AnimPhase,
-  BuildAnim,
-  ConfigProp,
-  DynamicObject,
-  Emit,
-} from "../../types";
+import { AnimPhase, BuildAnim, ConfigProp, DynamicObject } from "../../types";
 
 export type EventHook = (arg: {
   configProp: ComputedRef<BuildAnim | null>;
   getKeyframeName: ComputedRef<string>;
   animPhase: Ref<AnimPhase>;
   appear: boolean;
-  emit: Emit;
   getDuration: ComputedRef<string>;
   getDelay: ComputedRef<string>;
   getEase: ComputedRef<string>;
@@ -32,4 +25,5 @@ export interface UiTransitionElement extends HTMLElement {
   __done?: Function;
   __animPhase?: AnimPhase;
   __animId?: number;
+  __anim?: Animation;
 }

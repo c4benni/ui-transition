@@ -2,7 +2,6 @@ import { GlobalState } from "../state/types";
 
 export const initGlobalState: GlobalState = {
   init: false,
-  waapi: false,
   webWorker: null,
   styleId: "",
   styleCreated: false,

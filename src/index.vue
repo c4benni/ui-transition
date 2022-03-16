@@ -30,7 +30,7 @@ export default defineComponent({
 
   props,
 
-  setup(_props, { slots, emit }) {
+  setup(_props, { slots }) {
     const animPhase = ref<AnimPhase>("enter");
 
     const props = computed(() => _props);
@@ -98,7 +98,6 @@ export default defineComponent({
             animPhase,
             appear: props.value.appear,
             configProp: getConfig,
-            emit,
             getKeyframeName,
             getDuration,
             getDelay,

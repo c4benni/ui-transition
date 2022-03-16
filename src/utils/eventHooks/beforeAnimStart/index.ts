@@ -1,24 +1,20 @@
-import { capitalize, ComputedRef, Ref, RendererElement } from "vue";
+import { ComputedRef, Ref, RendererElement } from "vue";
 import { SpringObject } from "../../../props/types";
-import { globalState } from "../../../state";
 import {
   AnimPhase,
   BuildAnim,
   ConfigProp,
   DynamicObject,
-  Emit,
 } from "../../../types";
 import asyncWorker from "../../../worker/asyncWorker";
 import { Hook, UiTransitionElement } from "../types";
-import { $emit, getState, setAnimState, setProperties } from "../utils";
-import hasWaapi from "./hasWaapi";
-import noWaapi from "./noWaapi";
+import { getState, setAnimState, setProperties } from "../utils";
+import runAnimation from "./runAnimation";
 
 export default function beforeAnimStart(
   e: RendererElement,
   hook: Hook,
   animPhase: Ref<AnimPhase>,
-  emit: Emit,
   configProp: ComputedRef<BuildAnim | null>,
   getKeyframeName: ComputedRef<string>,
   getDuration: ComputedRef<string>,
@@ -29,11 +25,7 @@ export default function beforeAnimStart(
 ) {
   const state = getState(hook);
 
-  const { waapi } = globalState;
-
   setAnimState(state, animPhase);
-
-  $emit(emit, `before${capitalize(hook)}`, [e]);
 
   const el = e as unknown as UiTransitionElement;
 
@@ -56,42 +48,36 @@ export default function beforeAnimStart(
 
   // get first frame of the transition. This value is an object.
   const firstFrame = configProp.value.frame(
-    (from: number | number[], _: number | number[]) => from,
-    animPhase.value
-  );
-
-  // get last frame
-  const lastFrame = configProp.value.frame(
-    (_: number | number[], to: number | number[]) => to,
+    (from: number | number[], _) => from,
     animPhase.value
   );
 
   // store previous styles before setting first frame
   if (!el.__previousStyles) {
     el.__previousStyles = {};
-    for (const key in lastFrame) {
+    for (const key in firstFrame) {
       el.__previousStyles[key] = el.style.getPropertyValue(key);
     }
   }
 
-  setProperties(el, lastFrame);
   setProperties(el, firstFrame);
 
   // setup el if there's no waapi instance
-  if (!waapi) {
-    setProperties(el, {
-      "--uit-delay": `${delay}ms`,
-    });
+  setProperties(el, {
+    "--uit-delay": `${delay}ms`,
+  });
 
-    el.classList.add("ui-transition");
-  }
+  el.classList.add("ui-transition");
 
   const createSpring = async (): Promise<DynamicObject<any>> => {
     if (!configProp.value) return Promise.resolve({});
 
     // make frame() to be a string
     const buildAnim = () => {
-      if (typeof propsConfig === "object" && propsConfig.frame) {
+      if (
+        typeof propsConfig === "object" &&
+        typeof propsConfig.frame === "function"
+      ) {
         return {
           ...propsConfig,
           frame: propsConfig.frame.toString(),
@@ -107,30 +93,18 @@ export default function beforeAnimStart(
         buildAnim: buildAnim(),
         // TODO:  savePath: getAnimSavePath(configProp.value),
         keyframeName: getKeyframeName.value,
-        waapi,
         animPhase: animPhase.value,
         config: getSpring.value,
       },
     });
   };
 
-  if (waapi) {
-    hasWaapi(
-      createSpring,
-      el.dataset.uitDuration || getDuration.value,
-      el,
-      el.dataset.uitEase || getEase.value,
-      delay,
-      resetPreviousStyles,
-      lastFrame
-    );
-  } else {
-    noWaapi(
-      getKeyframeName.value,
-      createSpring,
-      el,
-      resetPreviousStyles,
-      el.dataset.uitEase || getEase.value
-    );
-  }
+  runAnimation(
+    getKeyframeName.value,
+    createSpring,
+    el,
+    resetPreviousStyles,
+    el.dataset.uitEase || getEase.value,
+    getDuration.value
+  );
 }
