@@ -1,6 +1,6 @@
 {
     "name": "ui-transition",
-    "version": "0.0.111",
+    "version": "0.0.208",
     "files": [
         "dist"
     ],
@@ -51,6 +51,6 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/c4benni/ui-transition.git"
+        "url": "github:c4benni/ui-transition"
     }
 }
