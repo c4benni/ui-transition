@@ -1,7 +1,13 @@
 import { ComputedRef, Ref, RendererElement } from "vue";
 import { AnimPhase, BuildAnim } from "../../../types";
 import { Hook, UiTransitionElement } from "../types";
-import { getState, resetEl, setAnimState, setProperties } from "../utils";
+import {
+  getFrame,
+  getState,
+  resetEl,
+  setAnimState,
+  setProperties,
+} from "../utils";
 
 export default function animDone(
   e: RendererElement,
@@ -19,10 +25,7 @@ export default function animDone(
   if (retainFinalStyle && configProp.value && animPhase.value === "enter") {
     const el = e as unknown as UiTransitionElement;
 
-    const lastFrame = configProp.value.frame(
-      (_: number | number[], to: number | number[]) => to,
-      animPhase.value
-    );
+    const lastFrame = getFrame(configProp.value, animPhase.value, true) || {};
 
     setProperties(el, lastFrame);
   }

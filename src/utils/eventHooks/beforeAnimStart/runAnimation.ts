@@ -1,5 +1,5 @@
 import { globalState } from "../../../state";
-import { DynamicObject } from "../../../types";
+import { AnimPhase, DynamicObject } from "../../../types";
 import { UiTransitionElement } from "../types";
 import { setProperties, toggleAnimEvents } from "../utils";
 
@@ -22,12 +22,8 @@ export default function runAnimation(
   const { styleId, keyframes } = globalState;
 
   const startAnimation = () => {
-    const cleanUp = (evt?: Event) => {
-      const cancelled = evt?.type === "animationcancel";
-
-      if (cancelled) {
-        el.__done?.(true);
-      } else if (el.__animId === animationId) {
+    const cleanUp = () => {
+      if (el.__animId === animationId) {
         resetPreviousStyles();
 
         el.__done?.();
@@ -77,7 +73,7 @@ export default function runAnimation(
         evt.target === evt.currentTarget &&
         evt.animationName === getKeyframeName
       ) {
-        cleanUp(evt);
+        cleanUp();
 
         const elem = evt.target as unknown as HTMLElement | null;
 
@@ -97,9 +93,7 @@ export default function runAnimation(
   if (!keyframes[getKeyframeName]) {
     createSpring()
       .then((animObject) => {
-        const {
-          data: { cssText, duration },
-        } = animObject;
+        const { cssText, duration } = animObject;
 
         keyframes[getKeyframeName] = `${duration}`;
 

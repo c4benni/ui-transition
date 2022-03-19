@@ -36,6 +36,7 @@ export interface Anim {
 export interface BuildAnim extends Anim {
   enter?: Anim | boolean;
   leave?: Anim | boolean;
+  frames?: Anim[];
 }
 
 export type ConfigProp = BuildAnim | string | boolean;

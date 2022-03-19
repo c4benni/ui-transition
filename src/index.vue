@@ -24,6 +24,7 @@ import extractDurationAndDelay from "./utils/extractDurationAndDelay";
 import extractEase from "./utils/extractEase";
 
 import extractSpring from "./utils/extractSpring";
+import { Mode } from "./props/types";
 
 export default defineComponent({
   name: "UiTransition",
@@ -32,6 +33,8 @@ export default defineComponent({
 
   setup(_props, { slots }) {
     const animPhase = ref<AnimPhase>("enter");
+
+    const inProgress = ref(false);
 
     const props = computed(() => _props);
 
@@ -71,28 +74,47 @@ export default defineComponent({
       return props.value.group && !props.value.tag;
     });
 
+    const mode = computed<Mode>(() => {
+      if (props.value.group) return undefined;
+
+      if (!props.value.mode) return "default";
+
+      return props.value.mode.toLowerCase() as Mode;
+    });
+
+    const getMode = computed(() => {
+      if (!mode.value) return undefined;
+
+      if (/out-in|in-out|default/i.test(mode.value)) {
+        return mode.value.toLowerCase();
+      }
+
+      // custom modes should work as out in
+      return "out-in";
+    });
+
     onBeforeMount(beforeMount);
 
     return function () {
       const transitionElArgs = {
         slots,
         data: {
-          type: "animation",
+          type: "transition",
           css: props.value.css,
           appear: props.value.appear,
-          mode: props.value.group ? undefined : props.value.mode,
+          mode: getMode.value,
           tag: props.value.group ? props.value.tag : undefined,
           moveClass: props.value.group ? props.value.moveClass : undefined,
 
-          enterFromClass: props.value.enterFromClass,
-          enterActiveClass: props.value.enterActiveClass,
-          enterToClass: props.value.enterToClass,
-          appearFromClass: props.value.appearFromClass,
-          appearActiveClass: props.value.appearActiveClass,
-          appearToClass: props.value.appearToClass,
-          leaveFromClass: props.value.leaveFromClass,
-          leaveActiveClass: props.value.leaveActiveClass,
-          leaveToClass: props.value.leaveToClass,
+          // enterFromClass: props.value.enterFromClass,
+          // enterActiveClass: props.value.enterActiveClass,
+          // enterToClass: props.value.enterToClass,
+          // appearFromClass: props.value.appearFromClass,
+          // appearActiveClass: props.value.appearActiveClass,
+          // appearToClass: props.value.appearToClass,
+          // leaveFromClass: props.value.leaveFromClass,
+          // leaveActiveClass: props.value.leaveActiveClass,
+          // leaveToClass: props.value.leaveToClass,
 
           ...eventHooks({
             animPhase,
@@ -103,11 +125,13 @@ export default defineComponent({
             getDelay,
             getEase,
             getSpring,
-            propsConfig: props.value.config,
             fragment,
             retainFinalStyle: props.value.retainFinalStyle,
+            inProgress,
+            mode,
           }),
         } as TransitionElProps,
+        inProgress,
       };
 
       if (props.value.group) {

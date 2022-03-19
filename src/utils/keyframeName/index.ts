@@ -11,7 +11,8 @@ export default function keyframeName(
 ): string {
   const configString = JSON.stringify({
     ...config,
-    frame: config.frame.toString(),
+    frame: config.frame?.toString() || undefined,
+    frames: config.frames?.map((item) => item.frame?.toString()).toString(),
   });
 
   const springString = JSON.stringify(spring);

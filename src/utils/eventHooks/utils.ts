@@ -1,6 +1,6 @@
 import { Ref, RendererElement } from "vue";
 import { kebabCase } from "..";
-import { AnimPhase, DynamicObject } from "../../types";
+import { AnimPhase, BuildAnim, DynamicObject } from "../../types";
 import { Hook, UiTransitionElement } from "./types";
 import { globalState } from "../../state";
 
@@ -48,4 +48,25 @@ export function resetEl(e: RendererElement) {
   ].forEach((prop) => {
     el.style.removeProperty(prop);
   });
+}
+
+export function getFrame(
+  configProp: BuildAnim,
+  animPhase: AnimPhase,
+  lastFrame?: boolean
+) {
+  const step = (from: number | number[], to: number | number[]) =>
+    lastFrame ? to : from;
+
+  if (Array.isArray(configProp?.frames)) {
+    const frames = {};
+
+    configProp?.frames.forEach((item) => {
+      Object.assign(frames, item.frame(step, animPhase));
+    });
+
+    return frames;
+  }
+
+  return configProp?.frame(step, animPhase);
 }

@@ -1,14 +1,9 @@
+import getSprings from "../../../getSpring";
 import { ComputedRef, Ref, RendererElement } from "vue";
 import { SpringObject } from "../../../props/types";
-import {
-  AnimPhase,
-  BuildAnim,
-  ConfigProp,
-  DynamicObject,
-} from "../../../types";
-import asyncWorker from "../../../worker/asyncWorker";
+import { AnimPhase, BuildAnim, DynamicObject } from "../../../types";
 import { Hook, UiTransitionElement } from "../types";
-import { getState, setAnimState, setProperties } from "../utils";
+import { getFrame, getState, setAnimState, setProperties } from "../utils";
 import runAnimation from "./runAnimation";
 
 export default function beforeAnimStart(
@@ -20,8 +15,7 @@ export default function beforeAnimStart(
   getDuration: ComputedRef<string>,
   getDelay: ComputedRef<string>,
   getEase: ComputedRef<string>,
-  getSpring: ComputedRef<SpringObject>,
-  propsConfig: ConfigProp
+  getSpring: ComputedRef<SpringObject>
 ) {
   const state = getState(hook);
 
@@ -47,10 +41,7 @@ export default function beforeAnimStart(
   resetPreviousStyles();
 
   // get first frame of the transition. This value is an object.
-  const firstFrame = configProp.value.frame(
-    (from: number | number[], _) => from,
-    animPhase.value
-  );
+  const firstFrame = getFrame(configProp.value, animPhase.value) || {};
 
   // store previous styles before setting first frame
   if (!el.__previousStyles) {
@@ -69,34 +60,15 @@ export default function beforeAnimStart(
 
   el.classList.add("ui-transition");
 
-  const createSpring = async (): Promise<DynamicObject<any>> => {
+  const createSpring = (): Promise<DynamicObject<any>> => {
     if (!configProp.value) return Promise.resolve({});
 
-    // make frame() to be a string
-    const buildAnim = () => {
-      if (
-        typeof propsConfig === "object" &&
-        typeof propsConfig.frame === "function"
-      ) {
-        return {
-          ...propsConfig,
-          frame: propsConfig.frame.toString(),
-        };
-      }
-
-      return propsConfig;
-    };
-
-    return asyncWorker({
-      type: "spring",
-      data: {
-        buildAnim: buildAnim(),
-        // TODO:  savePath: getAnimSavePath(configProp.value),
-        keyframeName: getKeyframeName.value,
-        animPhase: animPhase.value,
-        config: getSpring.value,
-      },
-    });
+    return getSprings(
+      configProp.value.frames?.map((x) => x.frame) || configProp.value.frame,
+      getSpring.value,
+      animPhase.value,
+      getKeyframeName.value
+    );
   };
 
   runAnimation(

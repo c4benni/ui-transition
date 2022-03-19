@@ -1,9 +1,4 @@
-import createWorker from "../../worker/createWorker";
 import { globalState } from "../../state";
-import asyncWorker from "../../worker/asyncWorker";
-import extractConfig from "../../utils/extractConfig";
-import transitions from "../../state/transitions";
-import updateWorkerTransition from "./updateWorkerTransition";
 
 type CreateStyleTag = () => string;
 
@@ -36,21 +31,5 @@ export default function beforeMount() {
     globalState.init = true;
 
     globalState.styleId = createStyleTag();
-
-    // create worker
-    if (!globalState.webWorker) {
-      globalState.webWorker = createWorker();
-
-      // send methods to worker
-      asyncWorker({
-        type: "addMethod",
-        data: {
-          extractConfig: extractConfig.toString(),
-        },
-      });
-
-      // send saved transitions to worker
-      updateWorkerTransition(transitions);
-    }
   }
 }

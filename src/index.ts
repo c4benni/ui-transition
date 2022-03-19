@@ -1,5 +1,4 @@
 import { App } from "vue";
-import getSpring from "./worker/getSpring";
 import { options } from "./defaults";
 import UiTransition from "./index.vue";
 import { InstallOptions } from "./types";
@@ -7,7 +6,7 @@ import { addSpring } from "./state/springs";
 import { addTransition } from "./state/transitions";
 import { DynamicObject } from "./types";
 import { kebabCase, pascalCase } from "./utils";
-import sleep from "./worker/sleep";
+import getSpring from "./getSpring/inject";
 
 let installed = false;
 
@@ -76,7 +75,6 @@ export default function install(app: App, config: InstallOptions = {}) {
     // options.globals returns object[] with keys matching the available globals, and values matching what the global value should be.
     // E.g {sleep: "somethingElse"}
     const availableGlobals: DynamicObject<Function> = {
-      sleep,
       getSpring,
     };
 

@@ -1,4 +1,3 @@
-import updateWorkerTransition from "../setup/hooks/updateWorkerTransition";
 import { DynamicObject } from "../types";
 import { ConstructAnim } from "./types";
 
@@ -27,12 +26,8 @@ export default transitions;
 
 export function addTransition(name: string, transition: ConstructAnim) {
   transitions[name] = transition;
-
-  updateWorkerTransition(transitions);
 }
 
 export function removeTransition(name: string) {
   delete transitions[name];
-
-  updateWorkerTransition(transitions);
 }

@@ -6,6 +6,19 @@ export default function extractConfig(
   configProp: ConfigProp,
   animPhase: AnimPhase
 ): BuildAnim {
+  if (Array.isArray(configProp)) {
+    const values: BuildAnim[] = [];
+
+    configProp.forEach((val) => {
+      values.push(extractConfig(val, animPhase) as BuildAnim);
+    });
+
+    return {
+      frames: values,
+      frame: () => ({}),
+    };
+  }
+
   if (!configProp) {
     return {
       frame: () => ({}),

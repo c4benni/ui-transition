@@ -3,7 +3,7 @@ import springPreset from "../../state/springs";
 import { AnimPhase } from "../../types";
 
 export default function extractSpring(
-  propsEase: Spring,
+  props: Spring,
   configEase: Spring | undefined,
   animPhase: AnimPhase
 ): SpringObject {
@@ -36,7 +36,7 @@ export default function extractSpring(
     return null;
   };
 
-  const getFirstPriority = getValue(propsEase);
+  const getFirstPriority = getValue(props);
 
   if (getFirstPriority) {
     return getFirstPriority;

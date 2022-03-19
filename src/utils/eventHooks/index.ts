@@ -5,7 +5,7 @@ import { DoneCallback, EventHook, Hook } from "./types";
 import beforeAnimStart from "./beforeAnimStart";
 import animStart from "./animStart";
 import animDone from "./animDone";
-import animcancelled from "./animCancelled";
+import animCancelled from "./animCancelled";
 
 const eventHooks: EventHook = function (args) {
   const {
@@ -17,9 +17,9 @@ const eventHooks: EventHook = function (args) {
     getDuration,
     getEase,
     getSpring,
-    propsConfig,
     fragment,
     retainFinalStyle,
+    inProgress,
   } = args;
 
   // create event hooks.
@@ -31,6 +31,8 @@ const eventHooks: EventHook = function (args) {
 
     return {
       [`onBefore${capitalizeHook}`]: (el: RendererElement) => {
+        inProgress.value = true;
+
         beforeAnimStart(
           el,
           hook,
@@ -40,32 +42,29 @@ const eventHooks: EventHook = function (args) {
           getDuration,
           getDelay,
           getEase,
-          getSpring,
-          propsConfig
+          getSpring
         );
       },
 
       [`on${capitalizeHook}`]: (el: RendererElement, done: DoneCallback) => {
-        animStart(
-          el,
-          done,
-          hook,
-          animPhase,
-          configProp,
-          getKeyframeName,
-          getDuration
-        );
+        inProgress.value = true;
+
+        animStart(el, done, hook, animPhase, configProp);
       },
 
       ...(fragment.value
         ? {}
         : {
             [`on${capitalizeHook}cancelled`]: (el: RendererElement) => {
-              animcancelled(el, hook);
+              inProgress.value = false;
+
+              animCancelled(el, hook);
             },
           }),
 
       [`onAfter${capitalizeHook}`]: (el: RendererElement) => {
+        inProgress.value = false;
+
         animDone(el, hook, animPhase, configProp, retainFinalStyle);
       },
     };

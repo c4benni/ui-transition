@@ -1,9 +1,7 @@
-// Vue's transition mode
-
 import transitions from "../state/transitions";
 import { AnimPhaseObject } from "../types";
 
-export type Mode = "out-in" | "in-out" | undefined;
+export type Mode = "default" | "out-in" | "in-out" | undefined;
 
 export type DurationAndDelay = number | AnimPhaseObject<number> | undefined;
 
