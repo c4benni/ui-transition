@@ -1,7 +1,16 @@
 import { DynamicObject } from "src/types";
 
-export const stepper = (from: number, to: number, frame: number) =>
-  (from - to) * frame + to;
+const savedStepper: DynamicObject<number> = {};
+
+export const stepper = (from: number, to: number, frame: number) => {
+  const savePath = `${from}~${to}~${frame}`;
+
+  if (savedStepper[savePath]) {
+    return savedStepper[savePath];
+  }
+
+  return (savedStepper[savePath] = (from - to) * frame + to);
+};
 
 const saved: DynamicObject<number | number[]> = {};
 
