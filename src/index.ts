@@ -6,17 +6,17 @@ import { addSpring } from "./state/springs";
 import { addTransition } from "./state/transitions";
 import { DynamicObject } from "./types";
 import { kebabCase, pascalCase } from "./utils";
-import getSpring from "./getSpring/inject";
+import getSpring from "./getAnimation/inject";
 
 let installed = false;
 
 export default function install(app: App, config: InstallOptions = {}) {
   if (installed) return;
 
-  let { componentName = options.componentName, globals } = config;
+  let { componentName = options.componentName, inject } = config;
 
-  if (typeof globals === "undefined") {
-    globals = options.globals;
+  if (typeof inject === "undefined") {
+    inject = options.inject;
   }
 
   // set component name
@@ -24,14 +24,14 @@ export default function install(app: App, config: InstallOptions = {}) {
     options.componentName = componentName;
   }
 
-  // set globals, expand any possible object, and set options as a object[]
-  if (globals) {
+  // set inject, expand any possible object, and set options as a object[]
+  if (inject) {
     const globalValues: DynamicObject<any>[] = [];
 
-    const validGlobals = ["sleep", "getSpring"];
+    const validinject = ["sleep", "getSpring"];
 
-    for (const item of globals) {
-      if (typeof item === "string" && validGlobals.includes(item)) {
+    for (const item of inject) {
+      if (typeof item === "string" && validinject.includes(item)) {
         globalValues.push({
           [item]: item,
         });
@@ -41,14 +41,14 @@ export default function install(app: App, config: InstallOptions = {}) {
       if (typeof item === "object") {
         for (const key in item) {
           // check if the key exists
-          if (typeof item[key] === "string" && validGlobals.includes(key)) {
+          if (typeof item[key] === "string" && validinject.includes(key)) {
             globalValues.push(item);
           }
         }
       }
     }
 
-    options.globals = globalValues;
+    options.inject = globalValues;
   }
 
   if (config.props) {
@@ -70,11 +70,11 @@ export default function install(app: App, config: InstallOptions = {}) {
     }
   }
 
-  if (options.globals) {
-    // store available globals for quick lookup.
-    // options.globals returns object[] with keys matching the available globals, and values matching what the global value should be.
+  if (options.inject) {
+    // store available inject for quick lookup.
+    // options.inject returns object[] with keys matching the available inject, and values matching what the global value should be.
     // E.g {sleep: "somethingElse"}
-    const availableGlobals: DynamicObject<Function> = {
+    const availableinject: DynamicObject<Function> = {
       getSpring,
     };
 
@@ -82,7 +82,7 @@ export default function install(app: App, config: InstallOptions = {}) {
       for (const [_key, _value] of Object.entries(obj)) {
         const key = `$${_value}`;
 
-        const value = availableGlobals[_key];
+        const value = availableinject[_key];
 
         if (value) {
           app.provide(key, value);
@@ -91,7 +91,7 @@ export default function install(app: App, config: InstallOptions = {}) {
       }
     };
 
-    for (const value of options.globals as DynamicObject<string>[]) {
+    for (const value of options.inject as DynamicObject<string>[]) {
       setGlobalValue(value);
     }
   }

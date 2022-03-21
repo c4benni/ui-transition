@@ -16,6 +16,7 @@ export const props: Props = {
   // leaveActiveClass: undefined,
   // leaveToClass: undefined,
   config: "fade",
+  type: "spring",
   delay: undefined,
   duration: undefined,
   ease: "linear",
@@ -27,5 +28,5 @@ export const props: Props = {
 
 export const options: Options = {
   componentName: "UiTransition",
-  globals: ["getSpring"],
+  inject: ["getSpring"],
 };

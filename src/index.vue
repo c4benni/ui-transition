@@ -11,7 +11,7 @@ import Transition from "./setup/transition";
 
 import beforeMount from "./setup/hooks/beforeMount";
 
-import { AnimPhase, TransitionElProps } from "./types";
+import { AnimPhase, AnimType, TransitionElProps } from "./types";
 
 import extractConfig from "./utils/extractConfig";
 
@@ -24,7 +24,6 @@ import extractDurationAndDelay from "./utils/extractDurationAndDelay";
 import extractEase from "./utils/extractEase";
 
 import extractSpring from "./utils/extractSpring";
-import { Mode } from "./props/types";
 
 export default defineComponent({
   name: "UiTransition",
@@ -42,13 +41,30 @@ export default defineComponent({
       extractConfig(props.value.config, animPhase.value)
     );
 
-    const getDuration = computed(() =>
-      extractDurationAndDelay(
-        props.value.duration,
-        getConfig.value.duration,
-        animPhase.value
-      )
-    );
+    const getType = computed(() => {
+      return props.value.type.toLowerCase() as AnimType;
+    });
+
+    const getDuration = computed(() => {
+      if (getType.value === "spring") {
+        return extractDurationAndDelay(
+          props.value.duration,
+          getConfig.value.duration,
+          animPhase.value
+        );
+      } else {
+        if (typeof props.value.duration === "undefined") {
+          return {
+            enter: "250",
+            leave: "200",
+          }[animPhase.value];
+        }
+
+        if (typeof props.value.duration === "object") {
+          return `${props.value.duration[animPhase.value] || 0}`;
+        } else return `${props.value.duration}`;
+      }
+    });
 
     const getDelay = computed(() =>
       extractDurationAndDelay(
@@ -67,30 +83,16 @@ export default defineComponent({
     );
 
     const getKeyframeName = computed(() =>
-      keyframeName(getConfig.value, getSpring.value, animPhase.value)
+      keyframeName(
+        getConfig.value,
+        getSpring.value,
+        animPhase.value,
+        getType.value
+      )
     );
 
     const fragment = computed(() => {
       return props.value.group && !props.value.tag;
-    });
-
-    const mode = computed<Mode>(() => {
-      if (props.value.group) return undefined;
-
-      if (!props.value.mode) return "default";
-
-      return props.value.mode.toLowerCase() as Mode;
-    });
-
-    const getMode = computed(() => {
-      if (!mode.value) return undefined;
-
-      if (/out-in|in-out|default/i.test(mode.value)) {
-        return mode.value.toLowerCase();
-      }
-
-      // custom modes should work as out in
-      return "out-in";
     });
 
     onBeforeMount(beforeMount);
@@ -102,7 +104,7 @@ export default defineComponent({
           type: "transition",
           css: props.value.css,
           appear: props.value.appear,
-          mode: getMode.value,
+          mode: props.value.mode,
           tag: props.value.group ? props.value.tag : undefined,
           moveClass: props.value.group ? props.value.moveClass : undefined,
 
@@ -128,7 +130,7 @@ export default defineComponent({
             fragment,
             retainFinalStyle: props.value.retainFinalStyle,
             inProgress,
-            mode,
+            getType,
           }),
         } as TransitionElProps,
         inProgress,

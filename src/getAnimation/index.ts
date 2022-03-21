@@ -1,16 +1,17 @@
 import { DynamicObject } from "src/types";
 import calcSpring from "./calcSpring";
 import interpolate from "./interpolate";
-import { GetSpring, GetSpringOutput } from "./type";
+import { GetAnimation, GetAnimationOutput } from "./type";
 
-const saved: DynamicObject<GetSpringOutput> = {};
+const saved: DynamicObject<GetAnimationOutput> = {};
 
 // calculates spring values and returns cssText, and duration
-const getSpring: GetSpring = async function (
+const getSpring: GetAnimation = async function (
   frame,
   config = {},
   phase,
-  keyframeName
+  keyframeName,
+  type
 ) {
   const savePath = `${
     Array.isArray(frame) ? frame.join() : frame
@@ -22,7 +23,13 @@ const getSpring: GetSpring = async function (
 
   const spring = await calcSpring(config);
 
-  const interpolatedValues = interpolate(spring, frame, phase, keyframeName);
+  const interpolatedValues = interpolate(
+    spring,
+    frame,
+    phase,
+    keyframeName,
+    type
+  );
 
   return (saved[savePath] = interpolatedValues);
 };

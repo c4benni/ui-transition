@@ -20,6 +20,7 @@ const eventHooks: EventHook = function (args) {
     fragment,
     retainFinalStyle,
     inProgress,
+    getType,
   } = args;
 
   // create event hooks.
@@ -42,7 +43,8 @@ const eventHooks: EventHook = function (args) {
           getDuration,
           getDelay,
           getEase,
-          getSpring
+          getSpring,
+          getType
         );
       },
 

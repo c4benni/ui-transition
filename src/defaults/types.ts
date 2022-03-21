@@ -1,5 +1,5 @@
 import { DurationAndDelay, Ease, Mode, Spring } from "../props/types";
-import { ConfigProp, DynamicObject } from "../types";
+import { AnimType, ConfigProp, DynamicObject } from "../types";
 
 export interface Props {
   css?: boolean;
@@ -15,6 +15,7 @@ export interface Props {
   leaveToClass?: string;
   moveClass?: boolean;
   config?: ConfigProp;
+  type?: AnimType;
   delay?: DurationAndDelay;
   duration?: DurationAndDelay;
   ease?: Ease;
@@ -27,5 +28,5 @@ export interface Props {
 
 export interface Options {
   componentName?: string;
-  globals?: (string | DynamicObject<string>)[];
+  inject?: (string | DynamicObject<string>)[];
 }

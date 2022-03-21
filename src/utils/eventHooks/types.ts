@@ -1,6 +1,6 @@
 import { BaseTransitionProps, ComputedRef, Ref } from "vue";
-import { Mode, SpringObject } from "../../props/types";
-import { AnimPhase, BuildAnim, ConfigProp, DynamicObject } from "../../types";
+import { SpringObject } from "../../props/types";
+import { AnimPhase, AnimType, BuildAnim, DynamicObject } from "../../types";
 
 export type EventHook = (arg: {
   configProp: ComputedRef<BuildAnim | null>;
@@ -14,7 +14,7 @@ export type EventHook = (arg: {
   fragment: ComputedRef<boolean>;
   retainFinalStyle: boolean;
   inProgress: Ref<boolean>;
-  mode: ComputedRef<Mode>;
+  getType: ComputedRef<AnimType>;
 }) => BaseTransitionProps;
 
 export type Hook = "appear" | "enter" | "leave";

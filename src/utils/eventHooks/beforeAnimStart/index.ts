@@ -1,10 +1,11 @@
-import getSprings from "../../../getSpring";
+import getAnimation from "../../../getAnimation";
 import { ComputedRef, Ref, RendererElement } from "vue";
 import { SpringObject } from "../../../props/types";
-import { AnimPhase, BuildAnim, DynamicObject } from "../../../types";
+import { AnimPhase, AnimType, BuildAnim } from "../../../types";
 import { Hook, UiTransitionElement } from "../types";
 import { getFrame, getState, setAnimState, setProperties } from "../utils";
 import runAnimation from "./runAnimation";
+import { GetAnimationOutput } from "../../../getAnimation/type";
 
 export default function beforeAnimStart(
   e: RendererElement,
@@ -15,7 +16,8 @@ export default function beforeAnimStart(
   getDuration: ComputedRef<string>,
   getDelay: ComputedRef<string>,
   getEase: ComputedRef<string>,
-  getSpring: ComputedRef<SpringObject>
+  getSpring: ComputedRef<SpringObject>,
+  getType: ComputedRef<AnimType>
 ) {
   const state = getState(hook);
 
@@ -60,14 +62,19 @@ export default function beforeAnimStart(
 
   el.classList.add("ui-transition");
 
-  const createSpring = (): Promise<DynamicObject<any>> => {
-    if (!configProp.value) return Promise.resolve({});
+  const createSpring = (): Promise<GetAnimationOutput> => {
+    if (!configProp.value)
+      return Promise.resolve({
+        cssText: "",
+        duration: 0,
+      });
 
-    return getSprings(
+    return getAnimation(
       configProp.value.frames?.map((x) => x.frame) || configProp.value.frame,
       getSpring.value,
       animPhase.value,
-      getKeyframeName.value
+      getKeyframeName.value,
+      getType.value
     );
   };
 

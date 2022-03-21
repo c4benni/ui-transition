@@ -50,6 +50,7 @@ export function resetEl(e: RendererElement) {
   });
 }
 
+// returns first or last frame
 export function getFrame(
   configProp: BuildAnim,
   animPhase: AnimPhase,

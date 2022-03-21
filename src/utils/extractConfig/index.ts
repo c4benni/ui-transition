@@ -9,7 +9,23 @@ export default function extractConfig(
   if (Array.isArray(configProp)) {
     const values: BuildAnim[] = [];
 
-    configProp.forEach((val) => {
+    const sortConfig = [...configProp].sort((a, b) => {
+      const getValue = (position: ConfigProp) =>
+        (typeof position === "object"
+          ? JSON.stringify({
+              ...position,
+              frame: position.frame ? position.frame?.toString() : undefined,
+            })
+          : `${position}`
+        ).toLowerCase();
+
+      const first = getValue(a);
+      const next = getValue(b);
+
+      return first > next ? 1 : first < next ? -1 : 0;
+    });
+
+    sortConfig.forEach((val) => {
       values.push(extractConfig(val, animPhase) as BuildAnim);
     });
 

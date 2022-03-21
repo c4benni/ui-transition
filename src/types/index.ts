@@ -43,7 +43,7 @@ export type ConfigProp = BuildAnim | string | boolean;
 
 export interface InstallOptions {
   componentName?: string;
-  globals?: (string | DynamicObject<string>)[];
+  inject?: (string | DynamicObject<string>)[];
   props?: Props;
   transitions?: DynamicObject<ConstructAnim>;
   springPreset?: SpringPreset;
@@ -52,3 +52,5 @@ export interface InstallOptions {
 export interface TransitionElProps
   extends TransitionGroupProps,
     TransitionProps {}
+
+export type AnimType = "spring" | "ease";

@@ -1,5 +1,6 @@
+import beforeMount from "../../../setup/hooks/beforeMount";
+import { GetAnimationOutput } from "../../../getAnimation/type";
 import { globalState } from "../../../state";
-import { AnimPhase, DynamicObject } from "../../../types";
 import { UiTransitionElement } from "../types";
 import { setProperties, toggleAnimEvents } from "../utils";
 
@@ -7,7 +8,7 @@ let calls = 0;
 
 export default function runAnimation(
   getKeyframeName: string,
-  createSpring: () => Promise<DynamicObject<any>>,
+  createSpring: () => Promise<GetAnimationOutput>,
   el: UiTransitionElement,
   resetPreviousStyles: () => void,
   ease: string,
@@ -32,57 +33,55 @@ export default function runAnimation(
       }
     };
 
-    const duration = () => {
-      // check dataset
-      if (el.dataset.uitDuration) {
-        return parseFloat(el.dataset.uitDuration);
-      }
+    if (keyframes[getKeyframeName] !== "0") {
+      const duration = () => {
+        // check dataset
+        if (el.dataset.uitDuration) {
+          return parseFloat(el.dataset.uitDuration);
+        }
 
-      // check the prop value
-      if (typeof getDuration === "string" && !!getDuration) {
-        return getDuration;
-      }
+        // check the prop value
+        if (typeof getDuration === "string" && !!getDuration) {
+          return getDuration;
+        }
 
-      return keyframes[getKeyframeName];
-    };
+        return keyframes[getKeyframeName];
+      };
 
-    requestAnimationFrame(() =>
+      el.addEventListener(
+        "animationstart",
+        (evt) => {
+          if (
+            evt.target === evt.currentTarget &&
+            evt.animationName === getKeyframeName &&
+            el.__animId === animationId
+          ) {
+            resetPreviousStyles();
+          }
+        },
+        { once: true }
+      );
+
+      const eventCallback = (evt: AnimationEvent) => {
+        if (
+          evt.target === evt.currentTarget &&
+          evt.animationName === getKeyframeName
+        ) {
+          cleanUp();
+
+          const elem = evt.target as unknown as HTMLElement | null;
+
+          toggleAnimEvents("remove", elem, eventCallback);
+        }
+      };
+
+      toggleAnimEvents("add", el, eventCallback);
+
       setProperties(el, {
         "--uit-anim-duration": `${duration()}ms`,
         "--uit-anim-name": getKeyframeName,
         "--uit-ease": ease,
-      })
-    );
-
-    el.addEventListener(
-      "animationstart",
-      (evt) => {
-        if (
-          evt.target === evt.currentTarget &&
-          evt.animationName === getKeyframeName &&
-          el.__animId === animationId
-        ) {
-          resetPreviousStyles();
-        }
-      },
-      { once: true }
-    );
-
-    const eventCallback = (evt: AnimationEvent) => {
-      if (
-        evt.target === evt.currentTarget &&
-        evt.animationName === getKeyframeName
-      ) {
-        cleanUp();
-
-        const elem = evt.target as unknown as HTMLElement | null;
-
-        toggleAnimEvents("remove", elem, eventCallback);
-      }
-    };
-
-    if (keyframes[getKeyframeName] !== "0") {
-      toggleAnimEvents("add", el, eventCallback);
+      });
     } else {
       requestAnimationFrame(() => {
         cleanUp();
@@ -98,11 +97,26 @@ export default function runAnimation(
         keyframes[getKeyframeName] = `${duration}`;
 
         if (cssText) {
-          const styleTag = document.getElementById(styleId);
+          const addNewStyles = () => {
+            const styleEl = document.getElementById(styleId);
 
-          if (styleTag) {
-            styleTag.innerText += cssText;
-          }
+            if (styleEl) {
+              const cloneStyleEl = styleEl.cloneNode(true) as HTMLStyleElement;
+
+              cloneStyleEl.innerText += cssText;
+
+              styleEl.replaceWith(cloneStyleEl);
+            } else {
+              // something awefully wrong happened; refresh!
+              globalState.init = false;
+
+              beforeMount();
+
+              addNewStyles();
+            }
+          };
+
+          addNewStyles();
         }
       })
       .finally(startAnimation);

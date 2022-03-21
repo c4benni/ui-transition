@@ -1,19 +1,28 @@
-import { DynamicObject } from "../../types";
-import { kebabCase } from "../../utils";
-import { GetSpringOutput } from "../type";
-import calculateSteps from "./calculateSteps";
-import { Interpolate } from "./type";
+import { GetAnimationOutput } from "../../type";
+import { DynamicObject, Frame, AnimPhase } from "../../../types";
+import { kebabCase } from "../../../utils";
+import calculateSteps from ".";
 
-const saved: DynamicObject<GetSpringOutput> = {};
+type SpringOnly = (
+  spring: number[],
+  frame: Frame | Frame[],
+  phase: AnimPhase,
+  keyframeName: string
+) => GetAnimationOutput;
 
-// interpolate values from frames to create CSSKeyframes;
-const interpolate: Interpolate = (springValues, frame, phase, keyframeName) => {
-  const savePath = `${springValues}~${
-    Array.isArray(frame) ? frame.join() : frame
-  }~${phase}~${keyframeName}`;
+// clear this object after 3secs to avoid storing the same string stored in the style tag over again;
+let saved: DynamicObject<GetAnimationOutput> = {};
 
-  if (saved[savePath]) {
-    return saved[savePath] as GetSpringOutput;
+const springOnly: SpringOnly = function (
+  springValues,
+  frame,
+  phase,
+  keyframeName
+) {
+  const savedPath = `${springValues}~${frame}~${phase}~${keyframeName}`;
+
+  if (saved[savedPath]) {
+    return saved[savedPath];
   }
 
   const springs: DynamicObject<string | number>[] = springValues
@@ -73,10 +82,18 @@ const interpolate: Interpolate = (springValues, frame, phase, keyframeName) => {
     cssText += "}";
   }
 
-  return {
+  saved[savedPath] = {
     cssText,
     duration,
   };
+
+  const timeout = setTimeout(() => {
+    saved = {};
+
+    clearTimeout(timeout);
+  }, 3000);
+
+  return saved[savedPath];
 };
 
-export default interpolate;
+export default springOnly;

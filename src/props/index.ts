@@ -1,6 +1,6 @@
 import { PropType } from "vue";
 import { props } from "../defaults";
-import { ConfigProp } from "../types";
+import { AnimType, ConfigProp } from "../types";
 import { DurationAndDelay, Ease, Mode, Spring } from "./types";
 
 export default {
@@ -19,42 +19,42 @@ export default {
     default: props.tag,
   },
 
-  enterFromClass: {
-    type: String,
-    default: props.enterFromClass,
-  },
-  enterActiveClass: {
-    type: String,
-    default: props.enterActiveClass,
-  },
-  enterToClass: {
-    type: String,
-    default: props.enterToClass,
-  },
-  appearFromClass: {
-    type: String,
-    default: props.appearFromClass,
-  },
-  appearActiveClass: {
-    type: String,
-    default: props.appearActiveClass,
-  },
-  appearToClass: {
-    type: String,
-    default: props.appearToClass,
-  },
-  leaveFromClass: {
-    type: String,
-    default: props.leaveFromClass,
-  },
-  leaveActiveClass: {
-    type: String,
-    default: props.leaveActiveClass,
-  },
-  leaveToClass: {
-    type: String,
-    default: props.leaveToClass,
-  },
+  // enterFromClass: {
+  //   type: String,
+  //   default: props.enterFromClass,
+  // },
+  // enterActiveClass: {
+  //   type: String,
+  //   default: props.enterActiveClass,
+  // },
+  // enterToClass: {
+  //   type: String,
+  //   default: props.enterToClass,
+  // },
+  // appearFromClass: {
+  //   type: String,
+  //   default: props.appearFromClass,
+  // },
+  // appearActiveClass: {
+  //   type: String,
+  //   default: props.appearActiveClass,
+  // },
+  // appearToClass: {
+  //   type: String,
+  //   default: props.appearToClass,
+  // },
+  // leaveFromClass: {
+  //   type: String,
+  //   default: props.leaveFromClass,
+  // },
+  // leaveActiveClass: {
+  //   type: String,
+  //   default: props.leaveActiveClass,
+  // },
+  // leaveToClass: {
+  //   type: String,
+  //   default: props.leaveToClass,
+  // },
 
   moveClass: {
     type: String,
@@ -64,6 +64,11 @@ export default {
   config: {
     type: [String, Object] as PropType<ConfigProp>,
     default: props.config,
+  },
+
+  type: {
+    type: String as PropType<AnimType>,
+    default: "spring",
   },
 
   delay: {
