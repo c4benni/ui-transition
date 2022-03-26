@@ -18,19 +18,14 @@
     "noImplicitAny": true,
     "baseUrl": "."
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "dev/main.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx"],
   "exclude": [
     "node_modules",
     "dist",
     "test",
     "dev",
     "src/App.vue",
-    "dev/main.ts"
+    "src/main.ts",
+    "index.html"
   ]
 }
