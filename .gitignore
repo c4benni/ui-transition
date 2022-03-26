@@ -4,3 +4,7 @@ dist
 dev
 *.local
 .npmrc
+App.vue
+index.html
+*.html
+src/main.ts
