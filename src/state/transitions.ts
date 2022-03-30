@@ -24,10 +24,10 @@ let transitions = {
 
 export default transitions;
 
-export function addTransition(name: string, transition: ConstructAnim) {
+export function addUiTransition(name: string, transition: ConstructAnim) {
   transitions[name] = transition;
 }
 
-export function removeTransition(name: string) {
+export function removeUiTransition(name: string) {
   delete transitions[name];
 }
