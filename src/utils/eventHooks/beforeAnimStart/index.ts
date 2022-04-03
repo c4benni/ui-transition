@@ -63,11 +63,12 @@ export default function beforeAnimStart(
   el.classList.add("ui-transition");
 
   const createSpring = (): Promise<GetAnimationOutput> => {
-    if (!configProp.value)
+    if (!configProp.value) {
       return Promise.resolve({
         cssText: "",
         duration: 0,
       });
+    }
 
     return getAnimation(
       configProp.value.frames?.map((x) => x.frame) || configProp.value.frame,

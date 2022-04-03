@@ -36,17 +36,23 @@ export const setAnimState = (arg: AnimPhase, animPhase: Ref<string>) =>
   (animPhase.value = arg);
 
 export function resetEl(e: RendererElement) {
-  const el = e as unknown as UiTransitionElement;
+  const timeout = setTimeout(() => {
+    const el = e as unknown as UiTransitionElement;
 
-  el.classList.remove("ui-transition", "ui-transition-paused");
+    if (!el.__done) {
+      [
+        "--uit-anim-duration",
+        "--uit-anim-name",
+        "--uit-delay",
+        "--uit-ease",
+      ].forEach((prop) => {
+        el.style.removeProperty(prop);
+      });
 
-  [
-    "--uit-anim-duration",
-    "--uit-anim-name",
-    "--uit-delay",
-    "--uit-ease",
-  ].forEach((prop) => {
-    el.style.removeProperty(prop);
+      el.classList.remove("ui-transition", "ui-transition-paused");
+    }
+
+    clearTimeout(timeout);
   });
 }
 

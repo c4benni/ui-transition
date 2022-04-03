@@ -4,5 +4,4 @@ import { resetEl } from "../utils";
 
 export default function animCancelled(el: RendererElement, hook: Hook) {
   resetEl(el);
-  console.log(el);
 }

@@ -98,19 +98,15 @@ export default function runAnimation(
 
         if (cssText) {
           const addNewStyles = () => {
-            const styleEl = document.getElementById(styleId);
+            const styleEl = document.getElementById(
+              styleId
+            ) as HTMLStyleElement;
 
             if (styleEl) {
-              const cloneStyleEl = styleEl.cloneNode(true) as HTMLStyleElement;
-
-              cloneStyleEl.innerText += cssText;
-
-              styleEl.replaceWith(cloneStyleEl);
+              styleEl.innerText += cssText;
             } else {
               // something awefully wrong happened; refresh!
-              globalState.init = false;
-
-              beforeMount();
+              beforeMount(true);
 
               addNewStyles();
             }
